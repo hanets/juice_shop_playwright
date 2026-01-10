@@ -4,6 +4,22 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      grep:
+        description: 'Grep pattern for tests (file name or test name)'
+        required: false
+        type: string
+      project:
+        description: 'Browser/Project to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - chromium
+        - firefox
+        - webkit
 
 permissions:
   contents: read
@@ -41,7 +57,17 @@ jobs:
       run: npx playwright install --with-deps
       
     - name: Run Playwright tests
-      run: npx playwright test
+      run: |
+        ARGS=""
+        if [ -n "${{ inputs.grep }}" ]; then
+          ARGS="$ARGS -g \"${{ inputs.grep }}\""
+        fi
+        if [ "${{ inputs.project }}" != "all" ] && [ -n "${{ inputs.project }}" ]; then
+          ARGS="$ARGS --project=${{ inputs.project }}"
+        fi
+        # Default run if no inputs (push/pr) or 'all' selected
+        echo "Running with args: $ARGS"
+        eval npx playwright test $ARGS
       env:
         BASE_URL: http://localhost:3000/
     

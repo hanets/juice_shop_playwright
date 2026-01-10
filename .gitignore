@@ -23,3 +23,6 @@ playwright/.cache/
 .github/agents/playwright-test-healer.agent.md
 .github/agents/playwright-test-planner.agent.md
 .github/workflows/copilot-setup-steps.yml
+
+# Allure
+allure-results/
