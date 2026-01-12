@@ -1,6 +1,7 @@
-import base, { APIRequestContext, Page, expect } from '@playwright/test';
+import base, { Page, expect } from '@playwright/test';
 import * as dotenv from 'dotenv';
-import { authenticate, registerUser } from '../../utils/httpClient';
+import { authenticate } from '../../utils/api/AuthService';
+import { registerUser } from '../../utils/api/UserService';
 import { createRegisterUserRequest } from '../../utils/models/user';
 import { HomePage } from '../../page-objects/HomePage';
 
@@ -61,10 +62,13 @@ async function injectTokenIntoUI(page: Page, token: string, bid: string, baseUrl
   ]);
 
   // Ensure token is available in storage before any page scripts run
-  await page.addInitScript(([t, b]) => {
-    window.localStorage.setItem('token', t);
-    window.sessionStorage.setItem('bid', b);
-  }, [token, bid]);
+  await page.addInitScript(
+    ([t, b]) => {
+      window.localStorage.setItem('token', t);
+      window.sessionStorage.setItem('bid', b);
+    },
+    [token, bid],
+  );
 }
 
 export { expect };

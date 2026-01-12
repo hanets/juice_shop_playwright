@@ -38,7 +38,7 @@ export function createRegisterUserRequest(
   password: string,
   securityAnswer = '03/29/70',
   securityQuestionId = 3,
-  securityQuestionText = "Mother's birth date? (MM/DD/YY)"
+  securityQuestionText = "Mother's birth date? (MM/DD/YY)",
 ): RegisterUserRequest {
   const nowIso = new Date().toISOString();
   return {

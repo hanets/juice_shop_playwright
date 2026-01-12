@@ -1,0 +1,19 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "playwright"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:playwright/recommended"
+  ],
+  "rules": {
+    "playwright/missing-playwright-await": "error",
+    "playwright/expect-expect": "off",
+    "playwright/no-focused-test": "warn",
+    "no-console": "warn"
+  }
+}
