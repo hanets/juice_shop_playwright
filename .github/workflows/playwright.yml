@@ -31,13 +31,21 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run ESLint
         run: npm run lint
 
       - name: Run Prettier
         run: npm run format
-
-      - uses: actions/checkout@v4
 
       - name: Checkout Juice Shop
         uses: actions/checkout@v4
@@ -45,19 +53,12 @@ jobs:
           repository: juice-shop/juice-shop
           path: juice-shop
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-
       - name: Install and Start Juice Shop
         working-directory: juice-shop
         run: |
           npm install
           npm start &
           npx wait-on http://localhost:3000
-
-      - name: Install dependencies
-        run: npm ci
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
