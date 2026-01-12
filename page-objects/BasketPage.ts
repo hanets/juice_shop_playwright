@@ -2,12 +2,14 @@ import { Locator, Page, expect } from '@playwright/test';
 
 export class BasketPage {
   private readonly root: Locator;
+  private readonly page: Page;
 
   constructor(page: Page) {
     // Scope strictly to the basket card
     this.root = page.locator('mat-card', {
       has: page.getByRole('heading', { name: /your basket/i }),
     });
+    this.page = page;
   }
 
   // ---------- Locators (scoped) ----------
@@ -17,15 +19,11 @@ export class BasketPage {
   }
 
   private increaseButton(row: Locator): Locator {
-    return row.locator('mat-cell.mat-column-quantity button', {
-      has: row.locator('svg[data-icon="plus-square"]'),
-    });
+    return row.locator('button:has(svg[data-icon="plus-square"])');
   }
 
   private decreaseButton(row: Locator): Locator {
-    return row.locator('mat-cell.mat-column-quantity button', {
-      has: row.locator('svg[data-icon="minus-square"]'),
-    });
+    return row.locator('button:has(svg[data-icon="minus-square"])');
   }
 
   private removeButton(row: Locator): Locator {
@@ -56,6 +54,7 @@ export class BasketPage {
     await expect(row).toBeVisible();
 
     for (let i = 0; i < times; i++) {
+      await this.expectProductQuantity(productName, 1 + i);
       await this.increaseButton(row).click();
     }
   }
@@ -90,6 +89,11 @@ export class BasketPage {
     const row = this.rowByProductName(productName);
     await expect(row).toBeVisible();
     await expect(this.quantityLabel(row)).toHaveText(String(expectedQty));
+  }
+
+  async verifySnackbarMaxQuantityForOrder(): Promise<void> {
+    const snackbar = this.page.getByText('You can order only up to 5 items of this product.');
+    await expect(snackbar).toBeVisible();
   }
 
   async expectProductPrice(productName: string, expectedPrice: string): Promise<void> {
