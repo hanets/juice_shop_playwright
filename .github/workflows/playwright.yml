@@ -31,6 +31,12 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Prettier
+        run: npm run format
+
       - uses: actions/checkout@v4
 
       - name: Checkout Juice Shop
@@ -52,12 +58,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
-
-      - name: Run Prettier
-        run: npm run format
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
