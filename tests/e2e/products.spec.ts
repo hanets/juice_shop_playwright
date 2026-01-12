@@ -16,7 +16,6 @@ test.describe('Products - Add to Basket', () => {
 
     const checkoutBO = new CheckoutBO(page, request);
     await checkoutBO.quickCheckout(testData.email, filteredProducts);
-    console.log('Proceeded to checkout successfully');
   });
 
   test('Complete Purchase Flow - Successful Checkout', async ({ page, request, testData }) => {

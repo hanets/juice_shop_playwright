@@ -167,11 +167,7 @@ export class CheckoutPage {
     // Extract order ID from /order-completion/ORDER_ID pattern
     const orderId = url.match(/#\/order-completion\/(.+)$/)?.[1];
 
-    if (!orderId) {
-      console.log('Could not extract order ID from URL:', url);
-    }
-
-    expect(orderId).toBeTruthy();
+    expect(orderId, `Could not extract order ID from URL: ${url}`).toBeTruthy();
     return orderId!;
   }
 

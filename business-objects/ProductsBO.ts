@@ -25,7 +25,7 @@ export async function addProductsToBasketAndVerify(
   await homePage.basketLink.click();
   // Further basket page validations can be added here
   const basketPage = new BasketPage(page);
-  basketPage.expectBasketOwnedByUser(testData.email);
+  await basketPage.expectBasketOwnedByUser(testData.email);
   for (const product of products) {
     await basketPage.expectProductQuantity(product.name, 1);
     await basketPage.expectProductPrice(product.name, product.price.toString());

@@ -68,7 +68,7 @@ export class PaymentBO {
   /**
    * Select a specific payment method by its identifier
    */
-  async selectPaymentMethod(paymentMethod: PaymentMethod): Promise<void> {
+  async selectPaymentMethod(_paymentMethod: PaymentMethod): Promise<void> {
     // For now, just use the last payment method since we just added it
     // This can be enhanced later if needed to select specific methods
     await this.paymentPage.selectLastPaymentMethod();

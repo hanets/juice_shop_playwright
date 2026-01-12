@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import * as dotenv from 'dotenv';
 import { HomePage } from '../../page-objects/HomePage';
@@ -8,11 +8,10 @@ dotenv.config();
 test.describe.parallel('Login Tests', () => {
   let homePage: HomePage;
 
-  test.beforeEach(async ({ page }, testInfo) => {
+  test.beforeEach(async ({ page }) => {
     homePage = new HomePage(page);
     await homePage.navigate(process.env.BASE_URL || '');
     await homePage.dismissPopupAndCookies();
-    console.log(`Running test: ${testInfo.title}`);
   });
 
   test('Login negative', async ({ page }) => {
@@ -26,7 +25,7 @@ test.describe.parallel('Login Tests', () => {
     expect(await page.screenshot()).toMatchSnapshot('login-failed.png');
   });
 
-  test('Register user', async ({ page }) => {
+  test('Register user', async ({ page: _page }) => {
     const email = `user${Date.now()}@example.com`;
     const password = 'Test@1234';
 
