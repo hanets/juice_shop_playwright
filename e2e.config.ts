@@ -10,25 +10,23 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
     video: 'off',
     screenshot: 'only-on-failure',
-    actionTimeout: 10000
+    actionTimeout: 10000,
   },
   projects: [
-    { name: 'chromium',
-      use: { browserName: 'chromium' },
-    },
+    { name: 'chromium', use: { browserName: 'chromium' } },
     {
       name: 'firefox',
       use: { browserName: 'firefox' },
     },
-{
+    {
       name: 'safari',
       use: {
         ...devices['Desktop Safari'],
-      }
+      },
     },
     {
       name: 'webkit',
       use: { browserName: 'webkit' },
-    }
-  ]
+    },
+  ],
 });
