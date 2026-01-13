@@ -10,6 +10,9 @@ export class HomePage {
   readonly basketLink: Locator;
   readonly productCards: Locator;
   readonly homeButton: Locator;
+  readonly sidenavToggle: Locator;
+  readonly contactUsLink: Locator;
+  readonly aboutUsLink: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -21,6 +24,10 @@ export class HomePage {
     this.homeButton = page.locator('#homeButton');
     // Product cards on the homepage grid
     this.productCards = page.locator('mat-card');
+    // Navigation locators
+    this.sidenavToggle = page.getByRole('button', { name: /open sidenav/i });
+    this.contactUsLink = page.getByRole('link', { name: /contact us page/i });
+    this.aboutUsLink = page.getByRole('link', { name: /about us/i });
   }
 
   async navigate(url: string) {
@@ -80,5 +87,21 @@ export class HomePage {
   async verifyLoggedIn(): Promise<void> {
     await expect(this.page.getByRole('button', { name: 'Show the shopping cart' })).toBeVisible();
     await expect(this.page.getByText('Your Basket')).toBeVisible();
+  }
+
+  /**
+   * Navigate to the feedback page from the sidenav
+   */
+  async navigateToFeedback(): Promise<void> {
+    await this.sidenavToggle.click();
+    await this.contactUsLink.click();
+  }
+
+  /**
+   * Navigate to About Us page from the sidenav
+   */
+  async navigateToAboutUs(): Promise<void> {
+    await this.sidenavToggle.click();
+    await this.aboutUsLink.click();
   }
 }
