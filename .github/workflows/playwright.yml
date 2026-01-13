@@ -124,9 +124,6 @@ jobs:
     # Add a dependency to the build job
     needs: test
 
-    # Only deploy on main/master branch pushes (not PRs or manual runs)
-    if: always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
       pages: write # to deploy to Pages
