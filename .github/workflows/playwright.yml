@@ -92,15 +92,32 @@ jobs:
           ref: gh-pages
           path: gh-pages
 
+      - name: Debug - Check gh-pages structure
+        if: always()
+        run: |
+          echo "=== Checking gh-pages structure ==="
+          ls -la gh-pages/ || echo "gh-pages directory not found"
+          ls -la gh-pages/allure/ || echo "gh-pages/allure directory not found"
+          ls -la gh-pages/allure/history/ || echo "gh-pages/allure/history directory not found"
+
       - name: Restore Allure history
         if: always()
         run: |
           mkdir -p allure-results/history
           cp -r gh-pages/allure/history/* allure-results/history/ || true
+          echo "=== History restored ==="
+          ls -la allure-results/history/ || echo "No history files found"
 
       - name: Generate Allure Report
         if: always()
         run: npx allure generate allure-results --clean -o allure-report
+
+      - name: Debug - Check generated report structure
+        if: always()
+        run: |
+          echo "=== Checking generated report structure ==="
+          ls -la allure-report/
+          ls -la allure-report/history/ || echo "allure-report/history directory not found"
 
       - name: Prepare reports for upload
         if: always()
@@ -123,7 +140,8 @@ jobs:
   deploy:
     # Add a dependency to the build job
     needs: test
-    if: always()
+    # Only deploy on push to main/master, not on pull requests
+    if: always() && github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
 
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
