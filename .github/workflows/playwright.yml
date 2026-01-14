@@ -104,8 +104,12 @@ jobs:
         if: always()
         run: |
           mkdir -p allure-results/history
-          cp -r gh-pages/allure/history/* allure-results/history/ || true
-          echo "=== History restored ==="
+          if [ -d "gh-pages/allure/history" ] && [ "$(ls -A gh-pages/allure/history 2>/dev/null)" ]; then
+            cp -r gh-pages/allure/history/* allure-results/history/
+            echo "=== History restored from gh-pages ==="
+          else
+            echo "=== No previous history found, starting fresh ==="
+          fi
           ls -la allure-results/history/ || echo "No history files found"
 
       - name: Generate Allure Report
