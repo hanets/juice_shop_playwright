@@ -83,6 +83,11 @@ jobs:
           eval npx playwright test $ARGS
         env:
           BASE_URL: http://localhost:3000/
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
 
       - name: Get Allure history
         uses: actions/checkout@v4

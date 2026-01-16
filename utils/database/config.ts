@@ -17,5 +17,9 @@ const requiredEnvVars = ['DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_DAT
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
-  throw new Error(`Missing required environment variables: ${missingEnvVars.join(', ')}`);
+  const errorMessage =
+    `Missing required environment variables: ${missingEnvVars.join(', ')}.\n` +
+    'For local development, copy .env.example to .env and fill in your database credentials.\n' +
+    'For GitHub Actions, ensure these secrets are configured in your repository settings.';
+  throw new Error(errorMessage);
 }
