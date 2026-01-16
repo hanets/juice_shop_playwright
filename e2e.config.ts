@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: 'tests/e2e',
   timeout: 60000,
   retries: 0,
+  reporter: [['html'], ['./utils/reporters/database-reporter.ts']],
   use: {
     headless: false,
     viewport: { width: 1280, height: 720 },

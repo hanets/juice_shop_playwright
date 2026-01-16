@@ -4,7 +4,12 @@ export default defineConfig({
   testDir: './tests',
   timeout: 30000,
   retries: 0,
-  reporter: [['html'], ['github'], ['allure-playwright']],
+  reporter: [
+    ['html'],
+    ['github'],
+    ['allure-playwright'],
+    ['./utils/reporters/database-reporter.ts'],
+  ],
   use: {
     headless: true,
     viewport: { width: 1280, height: 720 },
