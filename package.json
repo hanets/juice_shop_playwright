@@ -13,11 +13,24 @@
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --check .",
-    "format:fix": "prettier --write ."
+    "format:fix": "prettier --write .",
+    "load-test": "k6 run load-tests/main.ts",
+    "load-test:smoke": "k6 run -e SCENARIO=smoke load-tests/main.ts",
+    "load-test:load": "k6 run -e SCENARIO=load load-tests/main.ts",
+    "load-test:stress": "k6 run -e SCENARIO=stress load-tests/main.ts",
+    "load-test:spike": "k6 run -e SCENARIO=spike load-tests/main.ts",
+    "load-test:results": "k6 run -e SAVE_RESULTS=true load-tests/main.ts",
+    "load-test:cloud": "k6 run --out cloud load-tests/main.ts",
+    "load-test:cloud:smoke": "k6 run --out cloud -e SCENARIO=smoke load-tests/main.ts",
+    "load-test:cloud:load": "k6 run --out cloud -e SCENARIO=load load-tests/main.ts",
+    "load-test:cloud:stress": "k6 run --out cloud -e SCENARIO=stress load-tests/main.ts",
+    "load-test:cloud:spike": "k6 run --out cloud -e SCENARIO=spike load-tests/main.ts"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.2.0",
     "@playwright/test": "^1.57.0",
     "@types/dotenv": "^6.1.1",
+    "@types/k6": "^1.5.0",
     "@typescript-eslint/eslint-plugin": "^8.52.0",
     "@typescript-eslint/parser": "^8.52.0",
     "allure-commandline": "^2.36.0",
@@ -25,9 +38,11 @@
     "dotenv": "^16.3.1",
     "eslint": "^8.57.0",
     "eslint-plugin-playwright": "^2.5.0",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "mysql2": "^3.16.1"
+    "mysql2": "^3.16.1",
+    "date-fns": "^3.6.0"
   }
 }

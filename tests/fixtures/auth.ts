@@ -2,7 +2,7 @@ import base, { Page, expect } from '@playwright/test';
 import * as dotenv from 'dotenv';
 import { authenticate } from '../../utils/api/AuthService';
 import { registerUser } from '../../utils/api/UserService';
-import { createRegisterUserRequest } from '../../utils/models/user';
+import { createRandomRegisterUserRequest } from '../../utils/models/user';
 import { HomePage } from '../../page-objects/HomePage';
 
 export interface TestData {
@@ -19,11 +19,12 @@ export const test = base.extend<LoginNewUserFixture>({
   // Creates a brand new user via API, authenticates, and injects token into localStorage for UI session
   testData: async ({ request, page }, use) => {
     dotenv.config();
-    const email = `user_${Date.now()}@example.com`;
-    const password = 'Test@1234';
-
-    await registerUser(request, createRegisterUserRequest(email, password));
-    const loginRes = await authenticate(request, { email, password });
+    const registerPayload = createRandomRegisterUserRequest();
+    await registerUser(request, registerPayload);
+    const loginRes = await authenticate(request, {
+      email: registerPayload.email,
+      password: registerPayload.password,
+    });
     const token = loginRes.authentication.token;
     const bid = loginRes.authentication.bid;
 
@@ -36,7 +37,7 @@ export const test = base.extend<LoginNewUserFixture>({
     await home.dismissPopupAndCookies();
     await home.verifyUserLoggedIn();
 
-    await use({ email, password, homePage: home });
+    await use({ email: registerPayload.email, password: registerPayload.password, homePage: home });
   },
 });
 

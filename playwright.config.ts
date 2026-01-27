@@ -8,7 +8,7 @@ export default defineConfig({
     ['html'],
     ['github'],
     ['allure-playwright'],
-    ['./utils/reporters/database-reporter.ts'],
+    // ['./utils/reporters/database-reporter.ts'],
   ],
   use: {
     headless: true,

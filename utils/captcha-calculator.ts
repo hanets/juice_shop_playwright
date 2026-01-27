@@ -23,65 +23,13 @@ export function calculateCaptchaExpression(expression: string): number {
     throw new Error(`Invalid expression format: ${expression}`);
   }
 
-  // Split into tokens (numbers and operators)
-  const tokens = cleanExpression.match(/[+\-*]|\d+/g);
-  if (!tokens || tokens.length === 0) {
-    throw new Error(`Failed to parse expression: ${expression}`);
+  // Use JavaScript's eval for proper operator precedence
+  // This is safe because we've validated the expression format above
+  try {
+    return eval(cleanExpression);
+  } catch (error) {
+    throw new Error(`Failed to evaluate expression: ${expression}`, { cause: error });
   }
-
-  // Handle negative numbers at the start
-  let i = 0;
-  let result = 0;
-
-  // Parse first number (could be negative)
-  if (tokens[0] === '-') {
-    if (tokens.length < 2) {
-      throw new Error(`Invalid expression: ${expression}`);
-    }
-    result = -parseInt(tokens[1], 10);
-    i = 2;
-  } else if (tokens[0] === '+') {
-    if (tokens.length < 2) {
-      throw new Error(`Invalid expression: ${expression}`);
-    }
-    result = parseInt(tokens[1], 10);
-    i = 2;
-  } else {
-    result = parseInt(tokens[0], 10);
-    i = 1;
-  }
-
-  // Process remaining tokens in pairs (operator, number)
-  while (i < tokens.length) {
-    if (i + 1 >= tokens.length) {
-      throw new Error(`Invalid expression: operator without operand in ${expression}`);
-    }
-
-    const operator = tokens[i];
-    const operand = parseInt(tokens[i + 1], 10);
-
-    if (isNaN(operand)) {
-      throw new Error(`Invalid operand: ${tokens[i + 1]} in expression ${expression}`);
-    }
-
-    switch (operator) {
-      case '+':
-        result += operand;
-        break;
-      case '-':
-        result -= operand;
-        break;
-      case '*':
-        result *= operand;
-        break;
-      default:
-        throw new Error(`Unsupported operator: ${operator} in expression ${expression}`);
-    }
-
-    i += 2;
-  }
-
-  return result;
 }
 
 /**

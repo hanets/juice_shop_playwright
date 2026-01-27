@@ -30,8 +30,8 @@ export class FeedbackPage {
     });
     this.submitButton = page.locator('button', { hasText: /submit/i });
 
-    // Success message
-    this.successMessage = page.getByText('Thank you for your feedback.');
+    // Success message - flexible pattern to match different rating-based messages
+    this.successMessage = page.getByText(/thank you.*feedback/i);
   }
 
   /**

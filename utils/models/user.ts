@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker';
+
 export interface SecurityQuestion {
   id: number;
   question?: string;
@@ -30,6 +32,20 @@ export interface RegisteredUserData {
 export interface RegisterUserResponse {
   status: string;
   data: RegisteredUserData;
+}
+
+export function createRandomRegisterUserRequest() {
+  const email = faker.internet.email();
+  const password = faker.internet.password();
+
+  return createRegisterUserRequest(email, password);
+}
+
+export function getLoginRequest(email: string, password: string) {
+  return {
+    email,
+    password,
+  };
 }
 
 // Helper to generate register payload with sensible defaults
