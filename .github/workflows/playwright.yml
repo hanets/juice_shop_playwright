@@ -194,3 +194,46 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: public
+
+  # AI-Powered Failure Analysis - triggers when tests fail
+  analyze-failures:
+    needs: test
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download test reports
+        uses: actions/download-artifact@v4
+        with:
+          name: test-reports
+          path: ./downloaded-reports
+
+      - name: Extract Allure results
+        run: |
+          mkdir -p allure-results
+          if [ -d "downloaded-reports/allure" ]; then
+            cp -r downloaded-reports/allure/* allure-results/ 2>/dev/null || true
+          fi
+
+      - name: Run AI Analysis
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ALLURE_RESULTS_DIR: ./allure-results
+          OUTPUT_FILE: ai-analysis-report.md
+        run: npx ts-node utils/analysis/ai-test-analyzer.ts
+
+      - name: Upload AI analysis report
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-analysis-report
+          path: ai-analysis-report.md
+          retention-days: 30
