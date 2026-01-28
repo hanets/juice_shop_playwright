@@ -88,6 +88,7 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
       - name: Get Allure history
         uses: actions/checkout@v4
@@ -151,6 +152,11 @@ jobs:
             echo "Warning: allure-report directory not found"
           fi
 
+          # Include AI analysis report if it exists
+          if [ -f "ai-analysis-report.md" ]; then
+            cp ai-analysis-report.md public/
+          fi
+
           echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Test Reports</title><style>body{font-family:sans-serif;margin:2rem;display:flex;gap:2rem;justify-content:center;align-items:center;height:100vh;background:#f5f5f5;}a{display:block;padding:1.5rem 3rem;background:#fff;text-decoration:none;color:#333;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1);font-size:1.2rem;transition:all 0.2s;}a:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.15);}</style></head><body><a href="playwright/index.html">Playwright Report</a><a href="allure/index.html">Allure Report</a></body></html>' > public/index.html
 
       - name: Upload test reports
@@ -161,7 +167,7 @@ jobs:
           path: public/
           retention-days: 30
 
-      - name: Upload Allure results (raw JSON for AI analysis)
+      - name: Upload Allure results (raw JSON for record)
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -202,46 +208,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
           publish_dir: public
-
-  # AI-Powered Failure Analysis - triggers when tests fail
-  analyze-failures:
-    needs: test
-    if: failure()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Download Allure results
-        uses: actions/download-artifact@v4
-        with:
-          name: allure-results
-          path: ./allure-results
-
-      - name: Debug - List Allure results
-        run: |
-          echo "=== Allure results directory ==="
-          ls -la allure-results/ | head -20
-          echo "=== Total result files ==="
-          find allure-results -name "*-result.json" | wc -l
-
-      - name: Run AI Analysis
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          ALLURE_RESULTS_DIR: ./allure-results
-          OUTPUT_FILE: ai-analysis-report.md
-        run: npx ts-node utils/analysis/ai-test-analyzer.ts
-
-      - name: Upload AI analysis report
-        uses: actions/upload-artifact@v4
-        with:
-          name: ai-analysis-report
-          path: ai-analysis-report.md
-          retention-days: 30
