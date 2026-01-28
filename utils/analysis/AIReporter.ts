@@ -1,67 +1,62 @@
+/* eslint-disable no-console */
 import { FullResult, Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 import * as fs from 'fs';
 import * as path from 'path';
-import { analyzeSummary, FailureDetail, TestRunSummary } from './ai-test-analyzer';
+import { analyzeSummary, TestRunSummary } from './ai-test-analyzer';
 
 class AIReporter implements Reporter {
-  private failures: FailureDetail[] = [];
-  private totalTests = 0;
-  private passedTests = 0;
-  private failedTests = 0;
-  private brokenTests = 0;
-  private skippedTests = 0;
+  private result: TestRunSummary = {
+    total: 0,
+    passed: 0,
+    failed: 0,
+    broken: 0,
+    skipped: 0,
+    failures: [],
+  };
 
   onTestEnd(test: TestCase, result: TestResult) {
-    this.totalTests++;
+    this.result.total++;
     switch (result.status) {
       case 'passed':
-        this.passedTests++;
+        this.result.passed++;
         break;
       case 'failed':
-        this.failedTests++;
+        this.result.failed++;
         this.addFailure(test, result);
         break;
       case 'timedOut':
-        this.brokenTests++;
+        this.result.broken++;
         this.addFailure(test, result);
         break;
       case 'skipped':
-        this.skippedTests++;
+        this.result.skipped++;
         break;
       case 'interrupted':
-        this.brokenTests++;
+        this.result.broken++;
         break;
     }
   }
 
   private addFailure(test: TestCase, result: TestResult) {
-    this.failures.push({
+    this.result.failures.push({
       name: test.title,
       file: test.location.file,
       error: result.error?.message || 'Unknown error',
       trace: result.error?.stack || '',
+      analysisResult: result.annotations.find((a) => a.type === 'ai-analysis')?.description || '',
     });
   }
 
   async onEnd(result: FullResult) {
-    if (this.failedTests === 0 && this.brokenTests === 0) {
+    if (result.status === 'passed') {
       console.log('\n✅ All tests passed. Skipping AI summary.');
       return;
     }
 
-    const summary: TestRunSummary = {
-      total: this.totalTests,
-      passed: this.passedTests,
-      failed: this.failedTests,
-      broken: this.brokenTests,
-      skipped: this.skippedTests,
-      failures: this.failures,
-    };
-
     console.log('\n🤖 Generating AI Test Summary...');
-    const aiAnalysis = await analyzeSummary(summary);
+    const aiAnalysis = await analyzeSummary(this.result);
 
-    const report = this.formatMarkdownReport(summary, aiAnalysis);
+    const report = this.formatMarkdownReport(this.result, aiAnalysis);
 
     // Save to file
     const outputPath = path.join(process.cwd(), 'ai-analysis-report.md');

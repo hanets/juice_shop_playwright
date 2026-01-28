@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as dotenv from 'dotenv';
 import OpenAI from 'openai';
 
@@ -10,8 +11,16 @@ export interface FailureDetail {
   file: string;
   error: string;
   trace: string;
-  screenshotPath?: string;
+  screenshotBuffer?: Buffer;
   domContent?: string;
+}
+
+export interface FailureDetailSummary {
+  name: string;
+  file: string;
+  error: string;
+  trace: string;
+  analysisResult: string;
 }
 
 export interface TestRunSummary {
@@ -20,7 +29,7 @@ export interface TestRunSummary {
   failed: number;
   broken: number;
   skipped: number;
-  failures: FailureDetail[];
+  failures: FailureDetailSummary[];
 }
 
 /**
@@ -53,16 +62,25 @@ async function callAI(
       });
     }
 
+    console.log(systemPrompt);
+    console.log(content);
+    const startTime = Date.now();
+
     const response = await openai.chat.completions.create({
       model: MODEL,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: content },
       ],
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
       temperature: 0.3,
     });
 
+    const endTime = Date.now();
+    console.log(`AI Analysis generated in ${endTime - startTime}ms`);
+    console.log(response.usage);
+
+    console.log(response.choices[0]?.message?.content);
     return response.choices[0]?.message?.content || 'No analysis generated.';
   } catch (error) {
     console.error('OpenAI API error:', error);
@@ -73,12 +91,11 @@ async function callAI(
 /**
  * Analyzes a single test failure with context
  */
-export async function analyzeFailure(
-  failure: FailureDetail,
-  screenshotBuffer?: Buffer,
-): Promise<string> {
+export async function analyzeFailure(failure: FailureDetail): Promise<string> {
   const systemPrompt =
-    'You are an expert test automation engineer specializing in Playwright. Analyze the provided test failure and suggest a fix.';
+    'You are an expert test automation engineer specializing in Playwright. Analyze the provided test failure and suggest a fix. ' +
+    'Note that the error message might contain multiple failures (separated by ---) if soft assertions were used. ' +
+    'If a screenshot is not provided, it means the failure was likely an assertion failure rather than a locator issue.';
 
   const userPrompt = `
 ### Test Failure: ${failure.name}
@@ -97,7 +114,7 @@ Analyze the error and the provided context (including screenshot if available).
 3. Provide a specific code fix or recommendation.
 `;
 
-  return await callAI(systemPrompt, userPrompt, screenshotBuffer);
+  return await callAI(systemPrompt, userPrompt, failure.screenshotBuffer);
 }
 
 /**
@@ -111,6 +128,7 @@ export async function analyzeSummary(summary: TestRunSummary): Promise<string> {
 #### ${i + 1}. ${f.name}
 - **Error**: ${f.error.split('\n')[0]}
 - **File**: ${f.file}
+- **Analyzed result**: ${f.analysisResult}
 `,
     )
     .join('\n');
