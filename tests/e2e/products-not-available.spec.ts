@@ -1,9 +1,9 @@
-import { test } from '@playwright/test';
-import { ProductSearchResponse } from '../../utils/models/product';
-import { registerUser } from '../../utils/api/UserService';
-import { createRegisterUserRequest } from '../../utils/models/user';
-import { HomePage } from '../../page-objects/HomePage';
+import { test } from '../baseTest';
 import dotenv from 'dotenv';
+import { HomePage } from '../../page-objects/HomePage';
+import { registerUser } from '../../utils/api/UserService';
+import { ProductSearchResponse } from '../../utils/models/product';
+import { createRandomRegisterUserRequest } from '../../utils/models/user';
 
 test.describe('Products - Not available', () => {
   test('No products available', async ({ page, request }) => {
@@ -19,15 +19,12 @@ test.describe('Products - Not available', () => {
     const homePage = new HomePage(page);
     await homePage.navigate(process.env.BASE_URL || '');
     await homePage.dismissPopupAndCookies();
-    const email = `user_${Date.now()}@example.com`;
-    const password = 'Test@1234';
+    const user = createRandomRegisterUserRequest();
 
-    await registerUser(request, createRegisterUserRequest(email, password));
+    await registerUser(request, user);
 
     const loginPage = await homePage.openLoginPage();
-    // const signUpPage = await loginPage.navigateToSignUp();
-    // await signUpPage.signUp(email, password);
-    await loginPage.login(email, password);
+    await loginPage.login(user.email, user.password);
     await homePage.verifyUserLoggedIn();
 
     await homePage.verifyVisibleProductsCount(0);
