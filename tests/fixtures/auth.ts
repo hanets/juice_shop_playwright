@@ -1,9 +1,9 @@
-import base, { Page, expect } from '@playwright/test';
 import * as dotenv from 'dotenv';
+import { HomePage } from '../../page-objects/HomePage';
 import { authenticate } from '../../utils/api/AuthService';
 import { registerUser } from '../../utils/api/UserService';
 import { createRandomRegisterUserRequest } from '../../utils/models/user';
-import { HomePage } from '../../page-objects/HomePage';
+import { test as base, expect, Page } from '../baseTest';
 
 export interface TestData {
   email: string;
