@@ -5,7 +5,7 @@ test.describe('AI Analyzer Verification', () => {
     await page.goto(process.env.BASE_URL || '');
     // Try to click an element that doesn't exist to trigger a locator timeout
     const dismissCookieButton = page.locator("[aria-label='dismiss cookie label']");
-    await dismissCookieButton.click();
+    await dismissCookieButton.click({ timeout: 1000 });
   });
 
   test('assertion failure should NOT have screenshot @verify', async ({ page }) => {

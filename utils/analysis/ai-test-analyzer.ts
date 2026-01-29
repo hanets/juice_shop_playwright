@@ -33,6 +33,71 @@ export interface TestRunSummary {
 }
 
 /**
+ * Checks for common failure patterns to avoid LLM calls
+ */
+function checkPreAnalysisRules(failure: FailureDetail): string | null {
+  const error = (failure.error + ' ' + failure.trace).toLowerCase();
+
+  // 1. Timeouts
+  if (error.includes('page.goto: net::err_connection_refused')) {
+    return `1. **Category**: Environment
+2. **Verdict**: Test Issue (Infrastructure)
+3. **Root Cause**: Application is not running or not accessible.
+4. **New Locator**: N/A
+5. **Fix**: Check application status or restart the application.
+6. **Confidence Score**: 100% (Rule-based)`;
+  }
+
+  if (
+    error.includes('timeout 30000ms exceeded') ||
+    error.includes('timed out') ||
+    (error.includes('exceeded') && error.includes('timeout'))
+  ) {
+    if (error.includes('waiting for locator')) {
+      return null;
+    }
+    return `1. **Category**: Environment
+2. **Verdict**: Test Issue (Timeout)
+3. **Root Cause**: The operation timed out, likely due to slow environment or missing element.
+4. **New Locator**: N/A
+5. **Fix**: Check environment stability or increase timeout.
+6. **Confidence Score**: 100% (Rule-based)`;
+  }
+
+  // 2. HTTP 5xx Errors
+  if (
+    error.includes('500 internal server error') ||
+    error.includes('502 bad gateway') ||
+    error.includes('503 service unavailable') ||
+    error.includes('504 gateway timeout')
+  ) {
+    return `1. **Category**: Bug
+2. **Verdict**: Bug (Server Error)
+3. **Root Cause**: The server returned a 5xx status code.
+4. **New Locator**: N/A
+5. **Fix**: Investigate backend logs for the specified service.
+6. **Confidence Score**: 100% (Rule-based)`;
+  }
+
+  // 3. Infrastructure / Network
+  if (
+    error.includes('econnrefused') ||
+    error.includes('etimedout') ||
+    error.includes('enotfound') ||
+    error.includes('network error')
+  ) {
+    return `1. **Category**: Environment
+2. **Verdict**: Test Issue (Infrastructure)
+3. **Root Cause**: Network or infrastructure failure (connection refused/timeout).
+4. **New Locator**: N/A
+5. **Fix**: Verify backend services are up and reachable.
+6. **Confidence Score**: 100% (Rule-based)`;
+  }
+
+  return null;
+}
+
+/**
  * Call OpenAI API for analysis
  */
 async function callAI(
@@ -92,6 +157,13 @@ async function callAI(
  * Analyzes a single test failure with context
  */
 export async function analyzeFailure(failure: FailureDetail): Promise<string> {
+  // Check pre-analysis rules first
+  const preAnalysis = checkPreAnalysisRules(failure);
+  if (preAnalysis) {
+    console.log(`Pre-analysis rule matched for: ${failure.name}`);
+    return preAnalysis;
+  }
+
   const systemPrompt =
     'You are an expert test automation engineer specializing in TypeScript and Playwright. ' +
     'Analyze the provided test failure and suggest a fix. Be extremely concise. ' +
@@ -115,6 +187,7 @@ Provide a concise analysis in this format:
 3. **Root Cause**: [1 sentence explanation]
 4. **New Locator**: [Suggested Playwright locator if applicable]
 5. **Fix**: [Immediate code fix or action]
+6. **Confidence Score**: [0-100%]
 `;
 
   return await callAI(systemPrompt, userPrompt, failure.screenshotBuffer);
