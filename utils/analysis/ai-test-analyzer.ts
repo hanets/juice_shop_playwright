@@ -93,9 +93,10 @@ async function callAI(
  */
 export async function analyzeFailure(failure: FailureDetail): Promise<string> {
   const systemPrompt =
-    'You are an expert test automation engineer specializing in Playwright. Analyze the provided test failure and suggest a fix. ' +
-    'Note that the error message might contain multiple failures (separated by ---) if soft assertions were used. ' +
-    'If a screenshot is not provided, it means the failure was likely an assertion failure rather than a locator issue.';
+    'You are an expert test automation engineer specializing in TypeScript and Playwright. ' +
+    'Analyze the provided test failure and suggest a fix. Be extremely concise. ' +
+    'Always use Playwright-best-practice locators (e.g., getByRole, getByText) for suggestions. ' +
+    'Note that the error message might contain multiple failures (separated by ---) if soft assertions were used.';
 
   const userPrompt = `
 ### Test Failure: ${failure.name}
@@ -108,10 +109,12 @@ ${failure.trace.substring(0, 1000)}
 
 ${failure.domContent ? `### DOM Content (Snippet):\n\`\`\`html\n${failure.domContent.substring(0, 2000)}\n\`\`\`` : ''}
 
-Analyze the error and the provided context (including screenshot if available). 
-1. What went wrong?
-2. Is it a bug in the application or a flaky/incorrect test?
-3. Provide a specific code fix or recommendation.
+Provide a concise analysis in this format:
+1. **Category**: [Environment | Flaky | Bug | Locator]
+2. **Verdict**: [Bug or Test Issue]
+3. **Root Cause**: [1 sentence explanation]
+4. **New Locator**: [Suggested Playwright locator if applicable]
+5. **Fix**: [Immediate code fix or action]
 `;
 
   return await callAI(systemPrompt, userPrompt, failure.screenshotBuffer);
