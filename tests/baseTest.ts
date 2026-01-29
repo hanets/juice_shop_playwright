@@ -19,14 +19,14 @@ export const test = base.extend<{
       if (hasErrors || isFailed) {
         console.log(`\n🤖 Analyzing failure in: ${testInfo.title}...`);
 
-        const firstError = testInfo.errors[0]?.message || 'Unknown error';
-        const isLocatorIssue = /locator|timeout|strict mode/i.test(firstError);
+        // const firstError = testInfo.errors[0]?.message || 'Unknown error';
+        // const isLocatorIssue = /locator|timeout|strict mode/i.test(firstError);
 
-        let screenshotBuffer: Buffer | undefined;
-        if (isLocatorIssue) {
-          console.log('📸 Locator issue detected, capturing compressed screenshot...');
-          screenshotBuffer = await page.screenshot({ type: 'jpeg', quality: 50 });
-        }
+        // let screenshotBuffer: Buffer | undefined;
+        // if (isLocatorIssue) {
+        //   console.log('📸 Locator issue detected, capturing compressed screenshot...');
+        //   screenshotBuffer = await page.screenshot({ type: 'jpeg', quality: 50 });
+        // }
 
         // Clean up DOM content: remove script and style tags to reduce size
         let domContent = await page.content();
@@ -40,7 +40,7 @@ export const test = base.extend<{
           error: testInfo.errors.map((e) => stripAnsi(e.message)).join('\n---\n'), // Include all errors for soft asserts
           trace: testInfo.errors.map((e) => stripAnsi(e.stack)).join('\n---\n'),
           domContent: domContent,
-          screenshotBuffer: screenshotBuffer,
+          // screenshotBuffer: screenshotBuffer,
         };
 
         try {

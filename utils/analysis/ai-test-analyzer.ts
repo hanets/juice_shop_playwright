@@ -53,14 +53,14 @@ async function callAI(
       { type: 'text', text: userPrompt },
     ];
 
-    if (imageBuffer) {
-      content.push({
-        type: 'image_url',
-        image_url: {
-          url: `data:image/png;base64,${imageBuffer.toString('base64')}`,
-        },
-      });
-    }
+    // if (imageBuffer) {
+    //   content.push({
+    //     type: 'image_url',
+    //     image_url: {
+    //       url: `data:image/png;base64,${imageBuffer.toString('base64')}`,
+    //     },
+    //   });
+    // }
 
     console.log(systemPrompt);
     console.log(content);
