@@ -2,9 +2,27 @@
 import * as dotenv from 'dotenv';
 import OpenAI from 'openai';
 
+import { VectorStore } from './vector-store';
+
 dotenv.config();
 
 const MODEL = 'gpt-4o-mini';
+let vectorStore: VectorStore | null = null;
+
+const shouldEnableVectorStore = process.env.ENABLE_VECTOR_STORE === 'true';
+
+if (shouldEnableVectorStore) {
+  try {
+    vectorStore = new VectorStore();
+  } catch (e) {
+    console.warn(
+      'VectorStore initialization skipped (likely missing API key):',
+      e instanceof Error ? e.message : e,
+    );
+  }
+} else {
+  console.log('VectorStore is disabled via ENABLE_VECTOR_STORE flag.');
+}
 
 export interface FailureDetail {
   name: string;
@@ -157,6 +175,11 @@ async function callAI(
  * Analyzes a single test failure with context
  */
 export async function analyzeFailure(failure: FailureDetail): Promise<string> {
+  if (process.env.ENABLE_AI_RESULT !== 'true') {
+    console.log(`AI Analysis skipped for: ${failure.name} (ENABLE_AI_RESULT != true)`);
+    return 'AI Analysis disabled via environment variable.';
+  }
+
   // Check pre-analysis rules first
   const preAnalysis = checkPreAnalysisRules(failure);
   if (preAnalysis) {
@@ -170,6 +193,25 @@ export async function analyzeFailure(failure: FailureDetail): Promise<string> {
     'Always use Playwright-best-practice locators (e.g., getByRole, getByText) for suggestions. ' +
     'Note that the error message might contain multiple failures (separated by ---) if soft assertions were used.';
 
+  let historicalContext = '';
+  if (vectorStore) {
+    try {
+      const similar = await vectorStore.findSimilar(failure.error);
+      if (similar.length > 0) {
+        historicalContext =
+          '\n### Historical Similar Failures & Fixes:\n' +
+          similar
+            .map(
+              (s, i) =>
+                `${i + 1}. **Error**: ${s.error.substring(0, 100)}\n   **Past Fix**: ${s.analysis}`,
+            )
+            .join('\n');
+      }
+    } catch (e) {
+      console.error('Failed to fetch historical context:', e);
+    }
+  }
+
   const userPrompt = `
 ### Test Failure: ${failure.name}
 - **File**: ${failure.file}
@@ -181,6 +223,8 @@ ${failure.trace.substring(0, 1000)}
 
 ${failure.domContent ? `### DOM Content (Snippet):\n\`\`\`html\n${failure.domContent.substring(0, 2000)}\n\`\`\`` : ''}
 
+${historicalContext}
+
 Provide a concise analysis in this format:
 1. **Category**: [Environment | Flaky | Bug | Locator]
 2. **Verdict**: [Bug or Test Issue]
@@ -190,7 +234,16 @@ Provide a concise analysis in this format:
 6. **Confidence Score**: [0-100%]
 `;
 
-  return await callAI(systemPrompt, userPrompt, failure.screenshotBuffer);
+  const analysis = await callAI(systemPrompt, userPrompt, failure.screenshotBuffer);
+
+  // Save successful analysis to vector store
+  if (vectorStore && !analysis.includes('Error')) {
+    vectorStore
+      .addFailure(failure.error, analysis)
+      .catch((e) => console.error('Failed to save to vector store:', e));
+  }
+
+  return analysis;
 }
 
 /**
