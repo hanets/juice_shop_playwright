@@ -38,11 +38,12 @@
     "dotenv": "^16.3.1",
     "eslint": "^8.57.0",
     "eslint-plugin-playwright": "^2.5.0",
+    "openai": "^6.16.0",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "mysql2": "^3.16.1",
-    "date-fns": "^3.6.0"
+    "date-fns": "^3.6.0",
+    "mysql2": "^3.16.1"
   }
 }
