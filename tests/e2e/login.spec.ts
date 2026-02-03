@@ -1,16 +1,13 @@
-import { expect, test } from '../baseTest';
-
-import * as dotenv from 'dotenv';
 import { HomePage } from '../../page-objects/HomePage';
-
-dotenv.config();
+import { AppConfig } from '../../utils/config/AppConfig';
+import { expect, test } from '../baseTest';
 
 test.describe.parallel('Login Tests', () => {
   let homePage: HomePage;
 
   test.beforeEach(async ({ page }) => {
     homePage = new HomePage(page);
-    await homePage.navigate(process.env.BASE_URL || '');
+    await homePage.navigate(AppConfig.baseUrl);
     await homePage.dismissPopupAndCookies();
   });
 

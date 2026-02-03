@@ -2,6 +2,7 @@
 import { FullResult, Reporter, TestCase, TestResult } from '@playwright/test/reporter';
 import * as fs from 'fs';
 import * as path from 'path';
+import { AppConfig } from '../config/AppConfig';
 import { analyzeSummary, TestRunSummary } from './ai-test-analyzer';
 
 class AIReporter implements Reporter {
@@ -69,8 +70,8 @@ class AIReporter implements Reporter {
     console.log(`Report saved to: ${outputPath}`);
 
     // If running in GitHub Actions, add to Step Summary
-    if (process.env.GITHUB_STEP_SUMMARY) {
-      fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, report);
+    if (AppConfig.github.stepSummary) {
+      fs.appendFileSync(AppConfig.github.stepSummary, report);
     }
   }
 

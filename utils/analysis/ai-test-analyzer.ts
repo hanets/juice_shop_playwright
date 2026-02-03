@@ -1,15 +1,14 @@
 /* eslint-disable no-console */
-import * as dotenv from 'dotenv';
+
 import OpenAI from 'openai';
 
+import { AppConfig } from '../config/AppConfig';
 import { VectorStore } from './vector-store';
-
-dotenv.config();
 
 const MODEL = 'gpt-4o-mini';
 let vectorStore: VectorStore | null = null;
 
-const shouldEnableVectorStore = process.env.ENABLE_VECTOR_STORE === 'true';
+const shouldEnableVectorStore = AppConfig.ai.enableVectorStore;
 
 if (shouldEnableVectorStore) {
   try {
@@ -118,12 +117,8 @@ function checkPreAnalysisRules(failure: FailureDetail): string | null {
 /**
  * Call OpenAI API for analysis
  */
-async function callAI(
-  systemPrompt: string,
-  userPrompt: string,
-  imageBuffer?: Buffer,
-): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
+async function callAI(systemPrompt: string, userPrompt: string): Promise<string> {
+  const apiKey = AppConfig.ai.openApiKey;
   if (!apiKey) {
     console.error('OPENAI_API_KEY environment variable is not set');
     return '## Error\n\nOpenAI API key not configured.';
@@ -175,7 +170,7 @@ async function callAI(
  * Analyzes a single test failure with context
  */
 export async function analyzeFailure(failure: FailureDetail): Promise<string> {
-  if (process.env.ENABLE_AI_RESULT !== 'true') {
+  if (!AppConfig.ai.enableAiResult) {
     console.log(`AI Analysis skipped for: ${failure.name} (ENABLE_AI_RESULT != true)`);
     return 'AI Analysis disabled via environment variable.';
   }
@@ -234,7 +229,7 @@ Provide a concise analysis in this format:
 6. **Confidence Score**: [0-100%]
 `;
 
-  const analysis = await callAI(systemPrompt, userPrompt, failure.screenshotBuffer);
+  const analysis = await callAI(systemPrompt, userPrompt);
 
   // Save successful analysis to vector store
   if (vectorStore && !analysis.includes('Error')) {

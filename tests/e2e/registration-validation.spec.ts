@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import { HomePage } from '../../page-objects/HomePage';
+import { AppConfig } from '../../utils/config/AppConfig';
 import { expect, test } from '../baseTest';
 
 dotenv.config();
@@ -9,11 +10,11 @@ test.describe('Registration Form Validation', () => {
 
   test.beforeEach(async ({ page }) => {
     homePage = new HomePage(page);
-    await homePage.navigate(process.env.BASE_URL || 'http://localhost:3000/');
+    await homePage.navigate(AppConfig.baseUrl);
     await homePage.dismissPopupAndCookies();
   });
 
-  test('Should show error messages for empty required fields', async ({ page }) => {
+  test('Should show error messages for empty required fields', async ({ page: _page }) => {
     const loginPage = await homePage.openLoginPage();
     const signUpPage = await loginPage.navigateToSignUp();
 
@@ -33,7 +34,7 @@ test.describe('Registration Form Validation', () => {
     await expect(signUpPage.signUpButton).toBeDisabled();
   });
 
-  test('Should show error for invalid email format', async ({ page }) => {
+  test('Should show error for invalid email format', async ({ page: _page }) => {
     const loginPage = await homePage.openLoginPage();
     const signUpPage = await loginPage.navigateToSignUp();
 
@@ -44,7 +45,7 @@ test.describe('Registration Form Validation', () => {
     await expect(signUpPage.signUpButton).toBeDisabled();
   });
 
-  test('Should show error for short password', async ({ page }) => {
+  test('Should show error for short password', async ({ page: _page }) => {
     const loginPage = await homePage.openLoginPage();
     const signUpPage = await loginPage.navigateToSignUp();
 
@@ -55,7 +56,7 @@ test.describe('Registration Form Validation', () => {
     await expect(signUpPage.signUpButton).toBeDisabled();
   });
 
-  test('Should show error for mismatched passwords', async ({ page }) => {
+  test('Should show error for mismatched passwords', async ({ page: _page }) => {
     const loginPage = await homePage.openLoginPage();
     const signUpPage = await loginPage.navigateToSignUp();
 

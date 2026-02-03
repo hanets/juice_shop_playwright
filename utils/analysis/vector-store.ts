@@ -2,6 +2,7 @@
 import * as fs from 'fs';
 import OpenAI from 'openai';
 import * as path from 'path';
+import { AppConfig } from '../config/AppConfig';
 
 const EMBEDDING_MODEL = 'text-embedding-3-small';
 const STORE_PATH = path.join(process.cwd(), 'ai-failures-db.json');
@@ -19,7 +20,7 @@ export class VectorStore {
   private failures: StoredFailure[] = [];
 
   constructor() {
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = AppConfig.ai.openApiKey;
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY is required for VectorStore');
     }

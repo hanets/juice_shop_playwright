@@ -1,9 +1,10 @@
-import { test } from '../baseTest';
 import dotenv from 'dotenv';
 import { HomePage } from '../../page-objects/HomePage';
 import { registerUser } from '../../utils/api/UserService';
+import { AppConfig } from '../../utils/config/AppConfig';
 import { ProductSearchResponse } from '../../utils/models/product';
 import { createRandomRegisterUserRequest } from '../../utils/models/user';
+import { test } from '../baseTest';
 
 test.describe('Products - Not available', () => {
   test('No products available', async ({ page, request }) => {
@@ -17,7 +18,7 @@ test.describe('Products - Not available', () => {
 
     dotenv.config();
     const homePage = new HomePage(page);
-    await homePage.navigate(process.env.BASE_URL || '');
+    await homePage.navigate(AppConfig.baseUrl);
     await homePage.dismissPopupAndCookies();
     const user = createRandomRegisterUserRequest();
 
