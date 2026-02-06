@@ -1,7 +1,7 @@
-/* eslint-disable no-console */
 /* eslint-disable no-control-regex */
+/* eslint-disable no-console */
 import { test as base, expect, Page } from '@playwright/test';
-import { analyzeFailure, FailureDetail } from '../utils/analysis/ai-test-analyzer';
+import { FailureDetail } from '../utils/analysis/ai-test-analyzer';
 
 export const test = base.extend<{
   aiAnalysis: void;
@@ -17,16 +17,7 @@ export const test = base.extend<{
         (testInfo.status === 'failed' || testInfo.status === 'timedOut');
 
       if (hasErrors || isFailed) {
-        console.log(`\n🤖 Analyzing failure in: ${testInfo.title}...`);
-
-        // const firstError = testInfo.errors[0]?.message || 'Unknown error';
-        // const isLocatorIssue = /locator|timeout|strict mode/i.test(firstError);
-
-        // let screenshotBuffer: Buffer | undefined;
-        // if (isLocatorIssue) {
-        //   console.log('📸 Locator issue detected, capturing compressed screenshot...');
-        //   screenshotBuffer = await page.screenshot({ type: 'jpeg', quality: 50 });
-        // }
+        console.log(`\n🤖 Capturing failure context in: ${testInfo.title}...`);
 
         // Clean up DOM content: remove script and style tags to reduce size
         let domContent = await page.content();
@@ -37,31 +28,18 @@ export const test = base.extend<{
         const failure: FailureDetail = {
           name: testInfo.title,
           file: testInfo.file,
-          error: testInfo.errors.map((e) => stripAnsi(e.message)).join('\n---\n'), // Include all errors for soft asserts
+          error: testInfo.errors.map((e) => stripAnsi(e.message)).join('\n---\n'),
           trace: testInfo.errors.map((e) => stripAnsi(e.stack)).join('\n---\n'),
           domContent: domContent,
-          // screenshotBuffer: screenshotBuffer,
         };
 
-        try {
-          const analysis = await analyzeFailure(failure);
+        // Attach failure detail as JSON for the reporter to process
+        await testInfo.attach('ai-failure-context', {
+          body: JSON.stringify(failure),
+          contentType: 'application/json',
+        });
 
-          // Attach analysis to the report
-          await testInfo.attach('AI Failure Analysis', {
-            body: analysis,
-            contentType: 'text/markdown',
-          });
-
-          // Also add an annotation for quick visibility in some reporters
-          testInfo.annotations.push({
-            type: 'ai-analysis',
-            description: analysis.substring(0, 1000), // Keep it reasonable
-          });
-
-          console.log(`\n✅ AI Analysis attached for: ${testInfo.title}`);
-        } catch (error) {
-          console.error(`\n❌ Failed to generate AI analysis: ${error}`);
-        }
+        console.log(`\n✅ AI Failure context attached for: ${testInfo.title}`);
       }
     },
     { auto: true },

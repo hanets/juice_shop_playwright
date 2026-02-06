@@ -3,7 +3,7 @@ import { FullResult, Reporter, TestCase, TestResult } from '@playwright/test/rep
 import * as fs from 'fs';
 import * as path from 'path';
 import { AppConfig } from '../config/AppConfig';
-import { analyzeSummary, TestRunSummary } from './ai-test-analyzer';
+import { analyzeFailure, analyzeSummary, FailureDetail, TestRunSummary } from './ai-test-analyzer';
 
 class AIReporter implements Reporter {
   private result: TestRunSummary = {
@@ -15,6 +15,8 @@ class AIReporter implements Reporter {
     failures: [],
   };
 
+  private analysisPromises: Promise<void>[] = [];
+
   onTestEnd(test: TestCase, result: TestResult) {
     this.result.total++;
     switch (result.status) {
@@ -22,13 +24,14 @@ class AIReporter implements Reporter {
         this.result.passed++;
         break;
       case 'failed':
-        this.result.failed++;
-        this.addFailure(test, result);
+      case 'timedOut': {
+        const isFailed = result.status === 'failed';
+        if (isFailed) this.result.failed++;
+        else this.result.broken++;
+
+        this.handleFailure(test, result);
         break;
-      case 'timedOut':
-        this.result.broken++;
-        this.addFailure(test, result);
-        break;
+      }
       case 'skipped':
         this.result.skipped++;
         break;
@@ -38,20 +41,60 @@ class AIReporter implements Reporter {
     }
   }
 
-  private addFailure(test: TestCase, result: TestResult) {
+  private handleFailure(test: TestCase, result: TestResult) {
+    const failureIndex = this.result.failures.length;
+
+    // Add placeholder failure
     this.result.failures.push({
       name: test.title,
       file: test.location.file,
       error: result.error?.message || 'Unknown error',
       trace: result.error?.stack || '',
-      analysisResult: result.annotations.find((a) => a.type === 'ai-analysis')?.description || '',
+      analysisResult: 'Analysis in progress...',
     });
+
+    // Start background analysis
+    const promise = (async () => {
+      try {
+        // Find failure context attachment
+        const contextAttachment = result.attachments.find((a) => a.name === 'ai-failure-context');
+        let failureContext: FailureDetail | null = null;
+
+        if (contextAttachment && contextAttachment.path) {
+          const content = fs.readFileSync(contextAttachment.path, 'utf8');
+          failureContext = JSON.parse(content);
+        }
+
+        const failureToAnalyze: FailureDetail = failureContext || {
+          name: test.title,
+          file: test.location.file,
+          error: result.error?.message || 'Unknown error',
+          trace: result.error?.stack || '',
+        };
+
+        const analysis = await analyzeFailure(failureToAnalyze);
+        this.result.failures[failureIndex].analysisResult = analysis;
+      } catch (error) {
+        console.error(`[AIReporter] Failed to analyze failure for ${test.title}:`, error);
+        this.result.failures[failureIndex].analysisResult =
+          `Error during analysis: ${error instanceof Error ? error.message : String(error)}`;
+      }
+    })();
+
+    this.analysisPromises.push(promise);
   }
 
   async onEnd(result: FullResult) {
-    if (result.status === 'passed') {
+    if (result.status === 'passed' && this.analysisPromises.length === 0) {
       console.log('\n✅ All tests passed. Skipping AI summary.');
       return;
+    }
+
+    if (this.analysisPromises.length > 0) {
+      console.log(
+        `\n🤖 Waiting for ${this.analysisPromises.length} background AI analyses to complete...`,
+      );
+      await Promise.all(this.analysisPromises);
     }
 
     console.log('\n🤖 Generating AI Test Summary...');

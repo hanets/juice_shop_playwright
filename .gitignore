@@ -31,3 +31,4 @@ load-tests/.env.loadtest
 ai-analysis-report.md
 .playwright-cli/
 screenshots/
+ai-failures-db.json
