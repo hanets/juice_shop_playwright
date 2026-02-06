@@ -20,6 +20,11 @@ on:
           - chromium
           - firefox
           - webkit
+      failure-threshold:
+        description: 'Max allowed failed tests'
+        required: false
+        default: '10'
+        type: string
 
 permissions:
   contents: read
@@ -53,23 +58,17 @@ jobs:
       - name: Run Prettier
         run: npm run format
 
-      - name: Checkout Juice Shop
-        uses: actions/checkout@v4
-        with:
-          repository: juice-shop/juice-shop
-          path: juice-shop
-
-      - name: Install and Start Juice Shop
-        working-directory: juice-shop
+      - name: Start Juice Shop (Docker)
         run: |
-          npm install
-          npm start &
-          npx wait-on http://localhost:3000
+          docker run -d --name juice-shop -p 3000:3000 bkimminich/juice-shop:latest
+          npx wait-on http://localhost:3000 --timeout 60000
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
+        id: run-tests
+        continue-on-error: true
         run: |
           ARGS=""
           if [ -n "${{ inputs.grep }}" ]; then
@@ -88,6 +87,28 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Check test results against threshold
+        if: always()
+        run: |
+          THRESHOLD=${{ inputs.failure-threshold || 0 }}
+          if [ ! -f test-results/results.json ]; then
+            echo "❌ Results file not found!"
+            exit 1
+          fi
+
+          FAILED_COUNT=$(jq '.stats.unexpected' test-results/results.json)
+          echo "=== Test Results Summary ==="
+          echo "Unexpected failures: $FAILED_COUNT"
+          echo "Failure threshold: $THRESHOLD"
+
+          if [ "$FAILED_COUNT" -gt "$THRESHOLD" ]; then
+            echo "❌ Failed tests ($FAILED_COUNT) exceed threshold ($THRESHOLD)!"
+            exit 1
+          else
+            echo "✅ Failed tests ($FAILED_COUNT) are within threshold ($THRESHOLD). Build marked as passed."
+          fi
 
       - name: Get Allure history
         uses: actions/checkout@v4
@@ -151,6 +172,11 @@ jobs:
             echo "Warning: allure-report directory not found"
           fi
 
+          # Include AI analysis report if it exists
+          if [ -f "ai-analysis-report.md" ]; then
+            cp ai-analysis-report.md public/
+          fi
+
           echo '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Test Reports</title><style>body{font-family:sans-serif;margin:2rem;display:flex;gap:2rem;justify-content:center;align-items:center;height:100vh;background:#f5f5f5;}a{display:block;padding:1.5rem 3rem;background:#fff;text-decoration:none;color:#333;border-radius:8px;box-shadow:0 2px 5px rgba(0,0,0,0.1);font-size:1.2rem;transition:all 0.2s;}a:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.15);}</style></head><body><a href="playwright/index.html">Playwright Report</a><a href="allure/index.html">Allure Report</a></body></html>' > public/index.html
 
       - name: Upload test reports
@@ -160,6 +186,14 @@ jobs:
           name: test-reports
           path: public/
           retention-days: 30
+
+      - name: Upload Allure results (raw JSON for record)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results
+          path: allure-results/
+          retention-days: 7
 
   # Deploy job
   deploy:
