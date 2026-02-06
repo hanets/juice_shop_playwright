@@ -53,18 +53,10 @@ jobs:
       - name: Run Prettier
         run: npm run format
 
-      - name: Checkout Juice Shop
-        uses: actions/checkout@v4
-        with:
-          repository: juice-shop/juice-shop
-          path: juice-shop
-
-      - name: Install and Start Juice Shop
-        working-directory: juice-shop
+      - name: Start Juice Shop (Docker)
         run: |
-          npm install
-          npm start &
-          npx wait-on http://localhost:3000
+          docker run -d --name juice-shop -p 3000:3000 bkimminich/juice-shop:latest
+          npx wait-on http://localhost:3000 --timeout 60000
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
