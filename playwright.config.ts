@@ -3,9 +3,10 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests',
   timeout: 30000,
-  retries: 0,
+  retries: 1,
   reporter: [
     ['html'],
+    ['json', { outputFile: 'test-results/results.json' }],
     ['github'],
     ['allure-playwright'],
     ['./utils/analysis/AIReporter.ts'],

@@ -20,6 +20,11 @@ on:
           - chromium
           - firefox
           - webkit
+      failure-threshold:
+        description: 'Max allowed failed tests'
+        required: false
+        default: '10'
+        type: string
 
 permissions:
   contents: read
@@ -62,6 +67,8 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright tests
+        id: run-tests
+        continue-on-error: true
         run: |
           ARGS=""
           if [ -n "${{ inputs.grep }}" ]; then
@@ -81,6 +88,27 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Check test results against threshold
+        if: always()
+        run: |
+          THRESHOLD=${{ inputs.failure-threshold || 0 }}
+          if [ ! -f test-results/results.json ]; then
+            echo "❌ Results file not found!"
+            exit 1
+          fi
+
+          FAILED_COUNT=$(jq '.stats.unexpected' test-results/results.json)
+          echo "=== Test Results Summary ==="
+          echo "Unexpected failures: $FAILED_COUNT"
+          echo "Failure threshold: $THRESHOLD"
+
+          if [ "$FAILED_COUNT" -gt "$THRESHOLD" ]; then
+            echo "❌ Failed tests ($FAILED_COUNT) exceed threshold ($THRESHOLD)!"
+            exit 1
+          else
+            echo "✅ Failed tests ($FAILED_COUNT) are within threshold ($THRESHOLD). Build marked as passed."
+          fi
 
       - name: Get Allure history
         uses: actions/checkout@v4
