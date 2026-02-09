@@ -1,43 +1,73 @@
 "DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","1","should compare two objects with array fields custom comparator","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
-"","205","Product search API request","chromium","2026-02-09","passed","2026-02-09","API Tests","api/api.spec.ts","",""
-"","6318","Submit Customer Feedback with XSS-like Input is Safely Rendered","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
-"","3","should compare two objects with time comparator - error","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
-"","10304","Complete Purchase Flow - Successful Checkout - last item","chromium","2026-02-09","passed","2026-02-09","Products - Add to Basket","e2e/products.spec.ts","",""
-"","5553","Guest can access About Us and Contact Us pages","chromium","2026-02-09","failed","2026-02-09","Guest User - Unauthorized Access","e2e/guest-user.spec.ts","",""
-"","2808","No products available","chromium","2026-02-09","passed","2026-02-09","Products - Not available","e2e/products-not-available.spec.ts","",""
-"","1296","Guest should see Login option in Account menu","chromium","2026-02-09","passed","2026-02-09","Guest User - Unauthorized Access","e2e/guest-user.spec.ts","",""
-"","12549","Add products to basket based on quantity","chromium","2026-02-09","passed","2026-02-09","Products - Add to Basket","e2e/products.spec.ts","",""
-"","4","should compare two objects with error","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
-"","5","flaky test for retry verification","chromium","2026-02-09","passed","2026-02-09","","verify-retry.spec.ts","",""
+"","10941","Increase item quantity in basket - max amount","chromium","2026-02-09","passed","2026-02-09","Basket - Quantity Management","e2e/basket.spec.ts","",""
+"","1913","Should enable Register button when form is valid","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
+"","9","flaky test for retry verification","chromium","2026-02-09","passed","2026-02-09","","verify-retry.spec.ts","",""
+"","4","should compare two objects excluding keys","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
+"","157","seed","chromium","2026-02-09","passed","2026-02-09","Test group","seed.spec.ts","",""
+"","9574","Increase item quantity in basket","chromium","2026-02-09","passed","2026-02-09","Basket - Quantity Management","e2e/basket.spec.ts","",""
+"1. **Category**: Bug
+2. **Verdict**: Bug
+3. **Root Cause**: The application is displaying the title ""OWASP Juice Shop"" instead of the expected ""Wrong Title Indeed"".
+4. **New Locator**: N/A
+5. **Fix**: N/A
+6. **Confidence Score**: 95%","3381","assertion failure should NOT have screenshot @verify","chromium","2026-02-09","failed","2026-02-09","AI Analyzer Verification","e2e/test-analyzer.spec.ts","",""
+"","7","should compare two objects with array fields custom comparator","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
+"1. **Category**: Bug
+2. **Verdict**: Bug
+3. **Root Cause**: The application is returning a price format that includes excessive decimal places, which does not match the expected format in the test.
+4. **New Locator**: N/A
+5. **Fix**: N/A
+6. **Confidence Score**: 90%","11594","Complete Purchase Flow - Successful Checkout","chromium","2026-02-09","failed","2026-02-09","Products - Add to Basket","e2e/products.spec.ts","",""
+"","12709","Add products to basket based on quantity","chromium","2026-02-09","passed","2026-02-09","Products - Add to Basket","e2e/products.spec.ts","",""
+"1. **Category**: Locator  
+2. **Verdict**: Test Issue  
+3. **Root Cause**: The locator used for the cookie consent button may not be correctly targeting the element due to timing issues or incorrect attributes.  
+4. **New Locator**: `getByRole('button', { name: /dismiss cookie message/i })`  
+5. **Fix**: Update the locator in the test to use the suggested Playwright best-practice locator.  
+6. **Confidence Score**: 85%  ","4208","locator failure should have screenshot @verify","chromium","2026-02-09","failed","2026-02-09","AI Analyzer Verification","e2e/test-analyzer.spec.ts","",""
+"","2573","Register user","chromium","2026-02-09","passed","2026-02-09","Login Tests","e2e/login.spec.ts","",""
 "","0","Submit Customer Feedback with 1-Star Rating","chromium","2026-02-09","skipped","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
-"","5890","Submit Customer Feedback with Emoji/Unicode","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
-"","3","should compare two objects excluding keys in nested objects","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
-"","2766","Should show error for short password","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
-"","4","should compare two objects errors","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
-"","9416","Increase item quantity in basket","chromium","2026-02-09","passed","2026-02-09","Basket - Quantity Management","e2e/basket.spec.ts","",""
-"","1832","Should show error for mismatched passwords","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
-"","2335","soft assertion failures should be analyzed @verify","chromium","2026-02-09","failed","2026-02-09","AI Analyzer Verification","e2e/test-analyzer.spec.ts","",""
-"","3221","Register user","chromium","2026-02-09","passed","2026-02-09","Login Tests","e2e/login.spec.ts","",""
-"","2480","Should show error for invalid email format","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
-"","9613","Remove product from basket","chromium","2026-02-09","passed","2026-02-09","Basket - Quantity Management","e2e/basket.spec.ts","",""
-"","12044","Increase item quantity in basket - max amount","chromium","2026-02-09","passed","2026-02-09","Basket - Quantity Management","e2e/basket.spec.ts","",""
-"","2197","Should show error messages for empty required fields","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
-"","5398","Login negative","chromium","2026-02-09","failed","2026-02-09","Login Tests","e2e/login.spec.ts","",""
-"","1386","Guest should see products but not basket options","chromium","2026-02-09","passed","2026-02-09","Guest User - Unauthorized Access","e2e/guest-user.spec.ts","",""
-"","80","Register user API","chromium","2026-02-09","passed","2026-02-09","API Tests","api/api.spec.ts","",""
-"","6164","Submit Customer Feedback with 3-Star Rating","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
-"","251","Product search API request - unauthorized","chromium","2026-02-09","failed","2026-02-09","API Tests","api/api.spec.ts","",""
-"","4722","locator failure should have screenshot @verify","chromium","2026-02-09","failed","2026-02-09","AI Analyzer Verification","e2e/test-analyzer.spec.ts","",""
-"","1925","Should enable Register button when form is valid","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
-"","1","should compare two objects excluding keys","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
-"","152","API Login","chromium","2026-02-09","passed","2026-02-09","API Tests","api/api.spec.ts","",""
-"","5196","Submit Customer Feedback with 5-Star Rating","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
-"","10041","Complete Purchase Flow - Successful Checkout 1 item","chromium","2026-02-09","passed","2026-02-09","Products - Add to Basket","e2e/products.spec.ts","",""
-"","243","seed","chromium","2026-02-09","passed","2026-02-09","Test group","seed.spec.ts","",""
-"","2905","assertion failure should NOT have screenshot @verify","chromium","2026-02-09","failed","2026-02-09","AI Analyzer Verification","e2e/test-analyzer.spec.ts","",""
-"","5942","Submit Customer Feedback with Long Comment","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
-"","12277","Complete Purchase Flow - Successful Checkout","chromium","2026-02-09","failed","2026-02-09","Products - Add to Basket","e2e/products.spec.ts","",""
-"","9343","Decrease item quantity in basket","chromium","2026-02-09","passed","2026-02-09","Basket - Quantity Management","e2e/basket.spec.ts","",""
-"","8","should compare two objects with array fields ignoring order","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
+"","9635","Remove product from basket","chromium","2026-02-09","passed","2026-02-09","Basket - Quantity Management","e2e/basket.spec.ts","",""
+"","49","Register user API","chromium","2026-02-09","passed","2026-02-09","API Tests","api/api.spec.ts","",""
+"","5881","Submit Customer Feedback with Emoji/Unicode","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
+"","1574","Should show error for mismatched passwords","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
+"","2","should compare two objects with time comparator - error","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
+"","2","should compare two objects excluding keys in nested objects","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
 "","2","should compare two objects with time comparator","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
+"","1385","Guest should see products but not basket options","chromium","2026-02-09","passed","2026-02-09","Guest User - Unauthorized Access","e2e/guest-user.spec.ts","",""
+"","2212","Should show error for invalid email format","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
+"","5485","Submit Customer Feedback with Long Comment","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
+"","3","should compare two objects errors","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
+"","5680","Submit Customer Feedback with XSS-like Input is Safely Rendered","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
+"1. **Category**: Bug
+2. **Verdict**: Bug
+3. **Root Cause**: The expected title and URL do not match the actual application output, indicating a discrepancy in the application state or content.
+4. **New Locator**: N/A
+5. **Fix**: N/A
+6. **Confidence Score**: 95%","2905","soft assertion failures should be analyzed @verify","chromium","2026-02-09","failed","2026-02-09","AI Analyzer Verification","e2e/test-analyzer.spec.ts","",""
+"","2409","Should show error for short password","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
+"","5806","Submit Customer Feedback with 3-Star Rating","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
+"1. **Category**: Bug
+2. **Verdict**: Bug
+3. **Root Cause**: The test is failing due to a missing snapshot file, indicating a potential issue with the test setup or environment.
+4. **New Locator**: N/A
+5. **Fix**: N/A
+6. **Confidence Score**: 85%","4084","Login negative","chromium","2026-02-09","failed","2026-02-09","Login Tests","e2e/login.spec.ts","",""
+"","1399","Guest should see Login option in Account menu","chromium","2026-02-09","passed","2026-02-09","Guest User - Unauthorized Access","e2e/guest-user.spec.ts","",""
+"","2514","Should show error messages for empty required fields","chromium","2026-02-09","passed","2026-02-09","Registration Form Validation","e2e/registration-validation.spec.ts","",""
+"1. **Category**: Locator  
+2. **Verdict**: Test Issue  
+3. **Root Cause**: The locator `getByText('Customer Feedback')` resolves to multiple elements, causing a strict mode violation.  
+4. **New Locator**: `getByRole('heading', { name: 'Customer Feedback' })`  
+5. **Fix**: Update the test to use the new locator that targets the specific heading element.  
+6. **Confidence Score**: 90%  ","5082","Guest can access About Us and Contact Us pages","chromium","2026-02-09","failed","2026-02-09","Guest User - Unauthorized Access","e2e/guest-user.spec.ts","",""
+"","8749","Complete Purchase Flow - Successful Checkout 1 item","chromium","2026-02-09","passed","2026-02-09","Products - Add to Basket","e2e/products.spec.ts","",""
+"","4","should compare two objects with error","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
+"","7","should compare two objects with array fields ignoring order","chromium","2026-02-09","passed","2026-02-09","Comparator","comparator.spec.ts","",""
+"","4954","Submit Customer Feedback with 5-Star Rating","chromium","2026-02-09","passed","2026-02-09","Customer Feedback System Tests","feedback/submit-rating.spec.ts","",""
+"","9822","Complete Purchase Flow - Successful Checkout - last item","chromium","2026-02-09","passed","2026-02-09","Products - Add to Basket","e2e/products.spec.ts","",""
+"","188","Product search API request","chromium","2026-02-09","passed","2026-02-09","API Tests","api/api.spec.ts","",""
+"","2267","No products available","chromium","2026-02-09","passed","2026-02-09","Products - Not available","e2e/products-not-available.spec.ts","",""
+"","121","API Login","chromium","2026-02-09","passed","2026-02-09","API Tests","api/api.spec.ts","",""
+"","9350","Decrease item quantity in basket","chromium","2026-02-09","passed","2026-02-09","Basket - Quantity Management","e2e/basket.spec.ts","",""
+"","91","Product search API request - unauthorized","chromium","2026-02-09","failed","2026-02-09","API Tests","api/api.spec.ts","",""

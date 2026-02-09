@@ -1,0 +1,1 @@
+{"type":"metadata","data":{"description":"1. **Category**: Bug\n2. **Verdict**: Bug\n3. **Root Cause**: The test is failing due to a missing snapshot file, indicating a potential issue with the test setup or environment.\n4. **New Locator**: N/A\n5. **Fix**: N/A\n6. **Confidence Score**: 85%"}}

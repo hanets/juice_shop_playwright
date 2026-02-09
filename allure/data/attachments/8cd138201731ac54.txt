@@ -1,0 +1,6 @@
+1. **Category**: Locator
+2. **Verdict**: Test Issue
+3. **Root Cause**: The expected price format includes two decimal places, but the actual displayed price does not.
+4. **New Locator**: locator('mat-card').filter({ has: getByRole('heading', { name: /your basket/i }) }).locator('#price')
+5. **Fix**: Update the expected substring in the test to match the displayed format: change "5000.00¤" to "5000¤".
+6. **Confidence Score**: 85%
