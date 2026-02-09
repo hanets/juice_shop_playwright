@@ -1,8 +1,8 @@
 /* eslint-disable no-control-regex */
 /* eslint-disable no-console */
 import { test as base, expect, Page } from '@playwright/test';
-import { attachment } from 'allure-js-commons';
-import { FailureDetail, analyzeFailure } from '../utils/analysis/ai-test-analyzer';
+import { description } from 'allure-js-commons';
+import { analyzeFailure, FailureDetail } from '../utils/analysis/ai-test-analyzer';
 
 export const test = base.extend<{
   aiAnalysis: void;
@@ -44,16 +44,16 @@ export const test = base.extend<{
         });
 
         // Attach the full analysis body for HTML/JSON report visibility
-        await testInfo.attach('ai-analysis', {
+        await testInfo.attach('AI Analysis', {
           body: analysis,
-          contentType: 'text/markdown',
+          contentType: 'text/plain',
         });
 
-        // Also attach to Allure report (if Allure reporter is enabled)
+        // Enrich Allure report with description and labels
         try {
-          await attachment('AI Analysis', analysis, 'text/markdown');
+          await description(analysis);
         } catch (e) {
-          console.warn('Failed to attach AI analysis to Allure:', e);
+          console.warn('Failed to set Allure metadata:', e);
         }
 
         console.log(`\n✅ AI analysis attached for: ${testInfo.title}`);

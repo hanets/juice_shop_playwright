@@ -45,7 +45,7 @@ class AIReporter implements Reporter {
     };
 
     // Prefer per-test AI analysis attached from the test layer (baseTest fixture)
-    const aiAnalysisAttachment = result.attachments.find((a) => a.name === 'ai-analysis');
+    const aiAnalysisAttachment = result.attachments.find((a) => a.name === 'AI Analysis');
 
     if (aiAnalysisAttachment && aiAnalysisAttachment.path) {
       try {
