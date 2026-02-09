@@ -1,1 +1,0 @@
-{"type":"metadata","data":{"description":"1. **Category**: Bug\n2. **Verdict**: Bug\n3. **Root Cause**: The application is returning an unexpected title, which indicates a bug in the application logic or state.\n4. **New Locator**: N/A\n5. **Fix**: N/A\n6. **Confidence Score**: 90%"}}

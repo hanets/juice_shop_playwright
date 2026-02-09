@@ -1,1 +1,0 @@
-{"type":"metadata","data":{"description":"1. **Category**: Bug\n2. **Verdict**: Bug\n3. **Root Cause**: The expected title and URL do not match the actual application output, indicating a discrepancy in the application state or content.\n4. **New Locator**: N/A\n5. **Fix**: N/A\n6. **Confidence Score**: 95%"}}

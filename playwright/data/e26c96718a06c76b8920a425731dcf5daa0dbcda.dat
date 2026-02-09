@@ -1,1 +1,0 @@
-{"type":"metadata","data":{"description":"1. **Category**: Bug\n2. **Verdict**: Bug\n3. **Root Cause**: The application is displaying the title \"OWASP Juice Shop\" instead of the expected \"Wrong Title Indeed\".\n4. **New Locator**: N/A\n5. **Fix**: N/A\n6. **Confidence Score**: 95%"}}
