@@ -37,7 +37,7 @@ export interface FailureDetailSummary {
   file: string;
   error: string;
   trace: string;
-  analysisResult: string;
+  analysisResult?: string;
 }
 
 export interface TestRunSummary {
@@ -109,6 +109,16 @@ function checkPreAnalysisRules(failure: FailureDetail): string | null {
 3. **Root Cause**: Network or infrastructure failure (connection refused/timeout).
 4. **New Locator**: N/A
 5. **Fix**: Verify backend services are up and reachable.
+6. **Confidence Score**: 100% (Rule-based)`;
+  }
+
+  // 4. Visual Regression / Snapshots
+  if (error.includes("snapshot doesn't exist") || error.includes('writing actual')) {
+    return `1. **Category**: Snapshot
+2. **Verdict**: Test Issue (Missing Snapshot)
+3. **Root Cause**: A snapshot file for visual regression is missing from the repository.
+4. **New Locator**: N/A
+5. **Fix**: Run the test with \`--update-snapshots\` to generate the baseline image if this is expected.
 6. **Confidence Score**: 100% (Rule-based)`;
   }
 
@@ -187,7 +197,7 @@ export async function analyzeFailure(failure: FailureDetail): Promise<string> {
     'You are an expert test automation engineer specializing in TypeScript and Playwright. ' +
     'Analyze the provided test failure and suggest a fix when it is a test issue or locator problem. Be extremely concise. ' +
     'Always use Playwright-best-practice locators (e.g., getByRole, getByText) for suggestions. ' +
-    'If the failure is a real application bug (Category or Verdict is Bug), do NOT propose a new locator or a test fix; instead, set "New Locator" and "Fix" to "N/A". ' +
+    'If the failure is a real application bug (Verdict is Bug, e.g., an assertion failed because of wrong data or 500 error), do NOT propose a new locator or a test fix; instead, set "New Locator" and "Fix" to "N/A". ' +
     'Note that the error message might contain multiple failures (separated by ---) if soft assertions were used.';
 
   let historicalContext = '';
@@ -223,10 +233,10 @@ ${failure.domContent ? `### DOM Content (Snippet):\n\`\`\`html\n${failure.domCon
 ${historicalContext}
 
 Provide a concise analysis in this format:
-1. **Category**: [Environment | Flaky | Bug | Locator]
+1. **Category**: [Environment | Flaky | Bug | Locator | Visual | Snapshot] (Visual = mismatch, Snapshot = missing)
 2. **Verdict**: [Bug or Test Issue]
 3. **Root Cause**: [1 sentence explanation]
-4. **New Locator**: [If this is a test or locator issue, propose a Playwright locator; if it is a real application bug, write "N/A"]
+4. **New Locator**: [If this is a test or locator issue, propose a Playwright locator; if it is a real application bug or snapshot issue, write "N/A"]
 5. **Fix**: [If this is a test issue (not a real application bug), describe the immediate code fix or action; if it is a real application bug, write "N/A"]
 6. **Confidence Score**: [0-100%]
 `;
@@ -252,7 +262,7 @@ export async function analyzeSummary(summary: TestRunSummary): Promise<string> {
     return '';
   }
 
-  const failureDetails = summary.failures
+  const failureDetails = summary.failures.filter((f) => f.analysisResult)
     .slice(0, 10)
     .map(
       (f, i) => `

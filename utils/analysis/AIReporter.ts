@@ -40,26 +40,15 @@ class AIReporter implements Reporter {
       name: test.title,
       file: test.location.file,
       error: result.error?.message || 'Unknown error',
-      trace: result.error?.stack || '',
-      analysisResult: 'No AI analysis attached.',
+      trace: result.error?.stack || ''
     };
 
     // Prefer per-test AI analysis attached from the test layer (baseTest fixture)
     const aiAnalysisAttachment = result.attachments.find((a) => a.name === 'AI Analysis');
 
-    if (aiAnalysisAttachment && aiAnalysisAttachment.path) {
-      try {
-        const analysis = fs.readFileSync(aiAnalysisAttachment.path, 'utf8');
-        failureSummary.analysisResult = analysis;
-      } catch (error) {
-        console.error(
-          `[AIReporter] Failed to read ai-analysis attachment for ${test.title}:`,
-          error,
-        );
-        failureSummary.analysisResult = `Error reading ai-analysis attachment: ${
-          error instanceof Error ? error.message : String(error)
-        }`;
-      }
+    if (aiAnalysisAttachment && aiAnalysisAttachment.body) {
+      const analysis = aiAnalysisAttachment.body.toString();
+      failureSummary.analysisResult = analysis;
     }
 
     this.testFailures.set(test, failureSummary);
@@ -120,12 +109,26 @@ class AIReporter implements Reporter {
 
   private formatMarkdownReport(summary: TestRunSummary, aiAnalysis: string): string {
     const timestamp = new Date().toISOString();
+
+    // Group failures by category
+    const categoryCounts: Record<string, number> = {};
+    summary.failures.filter((f) => f.analysisResult).forEach((f) => {
+      const categoryMatch = f.analysisResult?.match(/\*\*Category\*\*:\s*\[?([^\]\n]+)\]?/);
+      const category = categoryMatch ? categoryMatch[1].trim() : 'Unknown';
+      categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+    });
+
+    const categoryTable = Object.entries(categoryCounts)
+      .map(([cat, count]) => `| ${cat} | ${count} |`)
+      .join('\n');
+
     return `# 🤖 AI Test Analysis Report
 
 > Generated: ${timestamp}
 
 ## 📊 Summary
 
+### 📈 Metrics
 | Metric | Value |
 |--------|-------|
 | Total Tests | ${summary.total} |
@@ -134,6 +137,11 @@ class AIReporter implements Reporter {
 | 🔄 Flaky | ${summary.flaky} |
 | 💔 Broken | ${summary.broken} |
 | ⏭️ Skipped | ${summary.skipped} |
+
+### 🏷️ Failures by Category
+| Category | Count |
+|----------|-------|
+${categoryTable || '| No categorized failures | 0 |'}
 
 ---
 
