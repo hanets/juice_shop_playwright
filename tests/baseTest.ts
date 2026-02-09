@@ -1,7 +1,8 @@
 /* eslint-disable no-control-regex */
 /* eslint-disable no-console */
 import { test as base, expect, Page } from '@playwright/test';
-import { FailureDetail } from '../utils/analysis/ai-test-analyzer';
+import { attachment } from 'allure-js-commons';
+import { FailureDetail, analyzeFailure } from '../utils/analysis/ai-test-analyzer';
 
 export const test = base.extend<{
   aiAnalysis: void;
@@ -33,13 +34,29 @@ export const test = base.extend<{
           domContent: domContent,
         };
 
-        // Attach failure detail as JSON for the reporter to process
-        await testInfo.attach('ai-failure-context', {
-          body: JSON.stringify(failure),
-          contentType: 'application/json',
+        // Run AI analysis at the test layer so that it can be attached
+        const analysis = await analyzeFailure(failure);
+
+        // Add annotation so it appears directly in Playwright reports
+        testInfo.annotations.push({
+          type: 'ai-analysis',
+          description: analysis,
         });
 
-        console.log(`\n✅ AI Failure context attached for: ${testInfo.title}`);
+        // Attach the full analysis body for HTML/JSON report visibility
+        await testInfo.attach('ai-analysis', {
+          body: analysis,
+          contentType: 'text/markdown',
+        });
+
+        // Also attach to Allure report (if Allure reporter is enabled)
+        try {
+          await attachment('AI Analysis', analysis, 'text/markdown');
+        } catch (e) {
+          console.warn('Failed to attach AI analysis to Allure:', e);
+        }
+
+        console.log(`\n✅ AI analysis attached for: ${testInfo.title}`);
       }
     },
     { auto: true },

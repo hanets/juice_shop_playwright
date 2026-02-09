@@ -3,99 +3,99 @@ import { FullResult, Reporter, TestCase, TestResult } from '@playwright/test/rep
 import * as fs from 'fs';
 import * as path from 'path';
 import { AppConfig } from '../config/AppConfig';
-import { analyzeFailure, analyzeSummary, FailureDetail, TestRunSummary } from './ai-test-analyzer';
+import { analyzeSummary, FailureDetailSummary, TestRunSummary } from './ai-test-analyzer';
 
 class AIReporter implements Reporter {
   private result: TestRunSummary = {
     total: 0,
     passed: 0,
     failed: 0,
+    flaky: 0,
     broken: 0,
     skipped: 0,
     failures: [],
   };
 
-  private analysisPromises: Promise<void>[] = [];
+  private testFailures: Map<TestCase, FailureDetailSummary> = new Map();
 
   onTestEnd(test: TestCase, result: TestResult) {
-    this.result.total++;
-    switch (result.status) {
-      case 'passed':
-        this.result.passed++;
-        break;
-      case 'failed':
-      case 'timedOut': {
-        const isFailed = result.status === 'failed';
-        if (isFailed) this.result.failed++;
-        else this.result.broken++;
-
-        this.handleFailure(test, result);
-        break;
-      }
-      case 'skipped':
-        this.result.skipped++;
-        break;
-      case 'interrupted':
-        this.result.broken++;
-        break;
+    if (
+      result.status === 'failed' ||
+      result.status === 'timedOut' ||
+      result.status === 'interrupted'
+    ) {
+      this.handleFailure(test, result);
+    } else if (result.status === 'passed') {
+      this.result.passed++;
+      this.result.total++;
+    } else if (result.status === 'skipped') {
+      this.result.skipped++;
+      this.result.total++;
     }
   }
 
   private handleFailure(test: TestCase, result: TestResult) {
-    const failureIndex = this.result.failures.length;
-
-    // Add placeholder failure
-    this.result.failures.push({
+    // Add placeholder or update existing failure
+    const failureSummary: FailureDetailSummary = {
       name: test.title,
       file: test.location.file,
       error: result.error?.message || 'Unknown error',
       trace: result.error?.stack || '',
-      analysisResult: 'Analysis in progress...',
-    });
+      analysisResult: 'No AI analysis attached.',
+    };
 
-    // Start background analysis
-    const promise = (async () => {
+    // Prefer per-test AI analysis attached from the test layer (baseTest fixture)
+    const aiAnalysisAttachment = result.attachments.find((a) => a.name === 'ai-analysis');
+
+    if (aiAnalysisAttachment && aiAnalysisAttachment.path) {
       try {
-        // Find failure context attachment
-        const contextAttachment = result.attachments.find((a) => a.name === 'ai-failure-context');
-        let failureContext: FailureDetail | null = null;
-
-        if (contextAttachment && contextAttachment.path) {
-          const content = fs.readFileSync(contextAttachment.path, 'utf8');
-          failureContext = JSON.parse(content);
-        }
-
-        const failureToAnalyze: FailureDetail = failureContext || {
-          name: test.title,
-          file: test.location.file,
-          error: result.error?.message || 'Unknown error',
-          trace: result.error?.stack || '',
-        };
-
-        const analysis = await analyzeFailure(failureToAnalyze);
-        this.result.failures[failureIndex].analysisResult = analysis;
+        const analysis = fs.readFileSync(aiAnalysisAttachment.path, 'utf8');
+        failureSummary.analysisResult = analysis;
       } catch (error) {
-        console.error(`[AIReporter] Failed to analyze failure for ${test.title}:`, error);
-        this.result.failures[failureIndex].analysisResult =
-          `Error during analysis: ${error instanceof Error ? error.message : String(error)}`;
+        console.error(
+          `[AIReporter] Failed to read ai-analysis attachment for ${test.title}:`,
+          error,
+        );
+        failureSummary.analysisResult = `Error reading ai-analysis attachment: ${
+          error instanceof Error ? error.message : String(error)
+        }`;
       }
-    })();
+    }
 
-    this.analysisPromises.push(promise);
+    this.testFailures.set(test, failureSummary);
   }
 
   async onEnd(result: FullResult) {
-    if (result.status === 'passed' && this.analysisPromises.length === 0) {
+    if (result.status === 'passed' && this.testFailures.size === 0) {
       console.log('\n✅ All tests passed. Skipping AI summary.');
       return;
     }
 
-    if (this.analysisPromises.length > 0) {
-      console.log(
-        `\n🤖 Waiting for ${this.analysisPromises.length} background AI analyses to complete...`,
-      );
-      await Promise.all(this.analysisPromises);
+    for (const test of this.testFailures.keys()) {
+      const outcome = test.outcome();
+      if (outcome === 'flaky') {
+        this.result.flaky++;
+        this.result.passed--;
+      } else if (outcome === 'unexpected') {
+        // Find if it was a timeout/interruption or a regular failure
+        const lastResult = test.results[test.results.length - 1];
+        if (
+          lastResult &&
+          (lastResult.status === 'timedOut' || lastResult.status === 'interrupted')
+        ) {
+          this.result.broken++;
+          this.result.total++;
+        } else {
+          this.result.failed++;
+          this.result.total++;
+        }
+      }
     }
+
+    // Populate final failures list (only for those that actually failed in the end or are flaky)
+    this.result.failures = Array.from(this.testFailures.values());
+
+    console.log(this.result);
 
     console.log('\n🤖 Generating AI Test Summary...');
     const aiAnalysis = await analyzeSummary(this.result);
@@ -131,6 +131,7 @@ class AIReporter implements Reporter {
 | Total Tests | ${summary.total} |
 | ✅ Passed | ${summary.passed} |
 | ❌ Failed | ${summary.failed} |
+| 🔄 Flaky | ${summary.flaky} |
 | 💔 Broken | ${summary.broken} |
 | ⏭️ Skipped | ${summary.skipped} |
 

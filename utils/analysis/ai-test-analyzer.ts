@@ -44,6 +44,7 @@ export interface TestRunSummary {
   total: number;
   passed: number;
   failed: number;
+  flaky: number;
   broken: number;
   skipped: number;
   failures: FailureDetailSummary[];
@@ -184,8 +185,9 @@ export async function analyzeFailure(failure: FailureDetail): Promise<string> {
 
   const systemPrompt =
     'You are an expert test automation engineer specializing in TypeScript and Playwright. ' +
-    'Analyze the provided test failure and suggest a fix. Be extremely concise. ' +
+    'Analyze the provided test failure and suggest a fix when it is a test issue or locator problem. Be extremely concise. ' +
     'Always use Playwright-best-practice locators (e.g., getByRole, getByText) for suggestions. ' +
+    'If the failure is a real application bug (Category or Verdict is Bug), do NOT propose a new locator or a test fix; instead, set "New Locator" and "Fix" to "N/A". ' +
     'Note that the error message might contain multiple failures (separated by ---) if soft assertions were used.';
 
   let historicalContext = '';
@@ -224,8 +226,8 @@ Provide a concise analysis in this format:
 1. **Category**: [Environment | Flaky | Bug | Locator]
 2. **Verdict**: [Bug or Test Issue]
 3. **Root Cause**: [1 sentence explanation]
-4. **New Locator**: [Suggested Playwright locator if applicable]
-5. **Fix**: [Immediate code fix or action]
+4. **New Locator**: [If this is a test or locator issue, propose a Playwright locator; if it is a real application bug, write "N/A"]
+5. **Fix**: [If this is a test issue (not a real application bug), describe the immediate code fix or action; if it is a real application bug, write "N/A"]
 6. **Confidence Score**: [0-100%]
 `;
 
@@ -245,6 +247,11 @@ Provide a concise analysis in this format:
  * Analyzes the entire test run
  */
 export async function analyzeSummary(summary: TestRunSummary): Promise<string> {
+  if (!AppConfig.ai.enableAiResult) {
+    console.log(`AI Analysis skipped (ENABLE_AI_RESULT != true)`);
+    return '';
+  }
+
   const failureDetails = summary.failures
     .slice(0, 10)
     .map(
@@ -265,6 +272,7 @@ export async function analyzeSummary(summary: TestRunSummary): Promise<string> {
 - Total: ${summary.total}
 - Passed: ${summary.passed}
 - Failed: ${summary.failed}
+- Flaky: ${summary.flaky}
 - Broken: ${summary.broken}
 - Skipped: ${summary.skipped}
 
