@@ -1,0 +1,5 @@
+
+🤖 Capturing failure context in: locator failure should have screenshot @verify...
+AI Analysis skipped for: locator failure should have screenshot @verify (ENABLE_AI_RESULT != true)
+
+✅ AI analysis attached for: locator failure should have screenshot @verify

@@ -1,0 +1,118 @@
+# Page snapshot
+
+```yaml
+- generic:
+  - generic [ref=e1]:
+    - generic [ref=e6]:
+      - heading "OWASP Juice Shop" [level=2] [ref=e9]
+      - navigation [ref=e10]:
+        - button
+        - heading "Contact" [level=3] [ref=e12]
+        - link "Go to contact us page" [ref=e13] [cursor=pointer]:
+          - /url: "#/contact"
+          - generic [ref=e15]:
+            - img [ref=e16]: feedback
+            - generic [ref=e17]: Customer Feedback
+        - separator [ref=e18]
+        - heading "Company" [level=3] [ref=e19]
+        - link "Go to about us page" [ref=e20] [cursor=pointer]:
+          - /url: "#/about"
+          - generic [ref=e22]:
+            - img [ref=e23]: business_center
+            - generic [ref=e24]: About Us
+        - link "Go to photo wall" [ref=e25] [cursor=pointer]:
+          - /url: "#/photo-wall"
+          - generic [ref=e27]:
+            - img [ref=e28]: camera
+            - generic [ref=e29]: Photo Wall
+        - separator [ref=e30]
+        - generic "Launch beginners tutorial" [ref=e31] [cursor=pointer]:
+          - generic [ref=e33]:
+            - img [ref=e34]: school
+            - generic [ref=e35]: Help getting started
+        - link "Go to OWASP Juice Shop GitHub page" [ref=e36] [cursor=pointer]:
+          - /url: ./redirect?to=https://github.com/juice-shop/juice-shop
+          - generic [ref=e38]:
+            - img [ref=e39]: github
+            - generic [ref=e41]: GitHub
+      - generic [ref=e43]:
+        - text: OWASP Juice Shop
+        - text: v19.1.1
+        - generic [ref=e44]:
+          - generic [ref=e45]: 
+          - generic [ref=e46]: 
+          - generic [ref=e47]: 
+          - generic [ref=e48]: 
+          - generic [ref=e49]: 
+          - generic [ref=e50]: 
+          - generic [ref=e51]: 
+          - generic [ref=e52]: 
+    - generic [ref=e54]:
+      - generic [ref=e57]:
+        - button "Open Sidenav" [active] [ref=e58] [cursor=pointer]:
+          - img [ref=e59]: menu
+        - button "Back to homepage" [ref=e62]:
+          - generic [ref=e64]:
+            - img "OWASP Juice Shop" [ref=e65]
+            - generic [ref=e66]: OWASP Juice Shop
+        - generic "Click to search" [ref=e69]:
+          - generic [ref=e70]:
+            - generic:
+              - generic:
+                - generic:
+                  - textbox [disabled]
+          - generic:
+            - img [ref=e71]: close
+            - img [ref=e72]: search
+        - button "Show/hide account menu" [ref=e73]:
+          - img [ref=e74]: account_circle
+          - generic [ref=e75]: Account
+        - button "Language selection menu" [ref=e78]:
+          - img [ref=e79]: language
+          - generic [ref=e80]: EN
+      - generic [ref=e86]:
+        - heading "Customer Feedback" [level=1] [ref=e87]
+        - generic [ref=e88]:
+          - generic [ref=e89]:
+            - generic:
+              - generic:
+                - generic [ref=e90]: Author
+                - textbox "Field with the name of the author" [disabled] [ref=e91]: anonymous
+          - generic [ref=e93]:
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - text: Comment
+                - generic [ref=e97]: "*"
+              - textbox "Field for entering the comment or the feedback" [ref=e99]:
+                - /placeholder: What did you like or dislike?
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - img [ref=e103]: exclamation-circle
+                - emphasis [ref=e105]: Max. 160 characters
+              - generic [ref=e107]: 0/160
+          - generic [ref=e108]:
+            - generic [ref=e109]: Rating
+            - generic "Slider for selecting the star rating" [ref=e110] [cursor=pointer]:
+              - slider [ref=e111]: "1"
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: 1★
+          - generic [ref=e112]:
+            - text: "CAPTCHA: What is"
+            - code [ref=e113]: 3+7-5
+            - text: "?"
+          - generic [ref=e116]:
+            - generic [ref=e117]:
+              - text: Result
+              - generic [ref=e118]: "*"
+            - textbox "Field for the result of the CAPTCHA code" [ref=e120]:
+              - /placeholder: Please enter the result of the CAPTCHA.
+        - button "Button to send the review" [disabled]:
+          - img: send
+          - generic: Submit
+  - generic [ref=e129]:
+    - generic [ref=e130]: Language has been changed to English
+    - button "Force page reload" [ref=e132]:
+      - generic [ref=e133]: Force page reload
+```

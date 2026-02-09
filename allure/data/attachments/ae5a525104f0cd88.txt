@@ -1,0 +1,5 @@
+
+🤖 Capturing failure context in: soft assertion failures should be analyzed @verify...
+AI Analysis skipped for: soft assertion failures should be analyzed @verify (ENABLE_AI_RESULT != true)
+
+✅ AI analysis attached for: soft assertion failures should be analyzed @verify
