@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv';
+import { AppConfig } from '../config/AppConfig';
 
-dotenv.config();
-
-export const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+export const BASE_URL = AppConfig.baseUrl;

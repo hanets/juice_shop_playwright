@@ -1,9 +1,9 @@
-import base, { Page, expect } from '@playwright/test';
-import * as dotenv from 'dotenv';
+import { HomePage } from '../../page-objects/HomePage';
 import { authenticate } from '../../utils/api/AuthService';
 import { registerUser } from '../../utils/api/UserService';
+import { AppConfig } from '../../utils/config/AppConfig';
 import { createRandomRegisterUserRequest } from '../../utils/models/user';
-import { HomePage } from '../../page-objects/HomePage';
+import { test as base, expect, Page } from '../baseTest';
 
 export interface TestData {
   email: string;
@@ -18,7 +18,6 @@ type LoginNewUserFixture = {
 export const test = base.extend<LoginNewUserFixture>({
   // Creates a brand new user via API, authenticates, and injects token into localStorage for UI session
   testData: async ({ request, page }, use) => {
-    dotenv.config();
     const registerPayload = createRandomRegisterUserRequest();
     await registerUser(request, registerPayload);
     const loginRes = await authenticate(request, {
@@ -28,7 +27,7 @@ export const test = base.extend<LoginNewUserFixture>({
     const token = loginRes.authentication.token;
     const bid = loginRes.authentication.bid;
 
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+    const baseUrl = AppConfig.baseUrl;
     await injectTokenIntoUI(page, token, bid.toString(), baseUrl);
 
     // Navigate and verify the UI session is active
