@@ -1,0 +1,6 @@
+1. **Category**: Bug
+2. **Verdict**: Bug
+3. **Root Cause**: The application is displaying a total price with excessive decimal places, which does not match the expected format.
+4. **New Locator**: N/A
+5. **Fix**: N/A
+6. **Confidence Score**: 90%

@@ -1,5 +1,0 @@
-
-🤖 Capturing failure context in: Complete Purchase Flow - Successful Checkout...
-AI Analysis skipped for: Complete Purchase Flow - Successful Checkout (ENABLE_AI_RESULT != true)
-
-✅ AI analysis attached for: Complete Purchase Flow - Successful Checkout

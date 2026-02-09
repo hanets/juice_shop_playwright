@@ -1,0 +1,6 @@
+1. **Category**: Locator
+2. **Verdict**: Test Issue
+3. **Root Cause**: The locator `getByText('Customer Feedback')` resolves to multiple elements, causing a strict mode violation.
+4. **New Locator**: getByRole('heading', { name: 'Customer Feedback' })
+5. **Fix**: Update the test to use `getByRole('heading', { name: 'Customer Feedback' })` to ensure it targets the correct element.
+6. **Confidence Score**: 90%

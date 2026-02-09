@@ -1,5 +1,0 @@
-
-🤖 Capturing failure context in: assertion failure should NOT have screenshot @verify...
-AI Analysis skipped for: assertion failure should NOT have screenshot @verify (ENABLE_AI_RESULT != true)
-
-✅ AI analysis attached for: assertion failure should NOT have screenshot @verify
