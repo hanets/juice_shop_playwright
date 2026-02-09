@@ -88,6 +88,8 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ENABLE_AI_RESULT: ${{ secrets.ENABLE_AI_RESULT }}
+          ENABLE_VECTOR_STORE: ${{ secrets.ENABLE_VECTOR_STORE }}
 
       - name: Check test results against threshold
         if: always()
